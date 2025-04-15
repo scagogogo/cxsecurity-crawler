@@ -1,0 +1,43 @@
+# 编译生成的文件
+/crawler
+/cve_crawler
+/cve_test
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# 测试二进制文件
+*.test
+
+# 输出文件
+*.json
+*.out
+*.log
+
+# 依赖目录
+/vendor/
+
+# IDE文件
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# 临时文件
+/tmp/
+/temp/
+
+# Go特定文件
+*.o
+*.a
+_obj
+_test
+_testmain.go
+*.cgo1.go
+*.cgo2.c
+_cgo_defun.c
+_cgo_gotypes.go
+_cgo_export.* 
