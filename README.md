@@ -31,14 +31,14 @@ go build -o cxsecurity
 # 基本用法
 ./cxsecurity exploit
 
-# 指定URL和输出文件
-./cxsecurity exploit -url="/exploit/85" -output="result.json"
+# 指定漏洞ID和输出文件
+./cxsecurity exploit -i 85 -o "result.json"
 
 # 只输出标题和URL字段
-./cxsecurity exploit -url="/exploit/85" -output="result.json" -fields="title,url"
+./cxsecurity exploit -i 85 -o "result.json" -f "title,url"
 
 # 输出所有字段
-./cxsecurity exploit -url="/exploit/85" -output="result.json" -fields="all"
+./cxsecurity exploit -i 85 -o "result.json" -f "all"
 ```
 
 #### 运行CVE详情爬虫
@@ -48,13 +48,13 @@ go build -o cxsecurity
 ./cxsecurity cve
 
 # 指定CVE编号和输出文件
-./cxsecurity cve -cve="CVE-2007-1411" -output="cve_result.json"
+./cxsecurity cve --cve="CVE-2007-1411" -o "cve_result.json"
 
 # 只输出描述和参考链接字段
-./cxsecurity cve -cve="CVE-2007-1411" -output="cve_result.json" -fields="description,references"
+./cxsecurity cve --cve="CVE-2007-1411" -o "cve_result.json" -f "description,references"
 
 # 输出所有字段
-./cxsecurity cve -cve="CVE-2007-1411" -output="cve_result.json" -fields="all"
+./cxsecurity cve --cve="CVE-2007-1411" -o "cve_result.json" -f "all"
 ```
 
 #### 运行漏洞详情爬虫
@@ -64,17 +64,17 @@ go build -o cxsecurity
 ./cxsecurity vuln-detail
 
 # 指定漏洞ID和输出文件
-./cxsecurity vuln-detail -id="WLB-2023010123" -output="vuln_detail.json"
+./cxsecurity vuln-detail --id="WLB-2023010123" -o "vuln_detail.json"
 
 # 只输出特定字段
-./cxsecurity vuln-detail -id="WLB-2023010123" -output="vuln_detail.json" -fields="title,risk_level,author"
+./cxsecurity vuln-detail --id="WLB-2023010123" -o "vuln_detail.json" -f "title,risk_level,author"
 ```
 
 ### 漏洞列表爬虫命令行参数
 
-- `-url`: 要爬取的页面路径，默认为 `/exploit/85`
-- `-output`: 结果输出的文件路径，默认为 `output.json`
-- `-fields`: 要输出的字段，多个字段用逗号分隔，例如 `title,url,date`。可选值包括：
+- `-i, --id`: 要爬取的漏洞ID，例如 `85`
+- `-o, --output`: 结果输出的文件路径，默认为 `exploit_result.json`
+- `-f, --fields`: 要输出的字段，多个字段用逗号分隔，例如 `title,url,date`。可选值包括：
   - `title`: 漏洞标题
   - `url`: 漏洞详情页URL
   - `date`: 发布日期
@@ -82,7 +82,7 @@ go build -o cxsecurity
   - `tags`: 标签列表
   - `author`: 作者名称
   - `author_url`: 作者页面URL
-  - `all`: 输出所有字段
+  - `all`: 输出所有字段（默认）
 
 ### CVE详情爬虫命令行参数
 
