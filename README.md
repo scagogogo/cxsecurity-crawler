@@ -28,18 +28,24 @@ go build -o cxsecurity
 #### 运行漏洞列表爬虫
 
 ```bash
-# 基本用法
+# 获取漏洞列表（默认第1页）
 ./cxsecurity exploit
 
-# 指定漏洞ID和输出文件
-./cxsecurity exploit -i 85 -o "result.json"
+# 获取指定ID的漏洞详情
+./cxsecurity exploit -i 2022010555 -o "result.json"
 
 # 只输出标题和URL字段
-./cxsecurity exploit -i 85 -o "result.json" -f "title,url"
+./cxsecurity exploit -i 2022010555 -o "result.json" -f "title,url"
 
 # 输出所有字段
-./cxsecurity exploit -i 85 -o "result.json" -f "all"
+./cxsecurity exploit -i 2022010555 -o "result.json" -f "all"
 ```
+
+> **注意**：
+> 1. 当不指定`-i`参数时，命令会爬取漏洞列表的第1页
+> 2. 当指定`-i`参数时，命令会爬取指定ID的漏洞详情页面
+> 3. 漏洞ID通常对应网站URL中的数字部分，如 `WLB-2022010555` 的ID为 `2022010555`
+> 4. 如果返回"Ups! 404 :("，说明该ID的漏洞不存在，请尝试有效的漏洞ID
 
 #### 运行CVE详情爬虫
 
