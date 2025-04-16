@@ -21,43 +21,53 @@
 #### 编译
 
 ```bash
-# 编译漏洞列表爬虫
-go build -o crawler cmd/crawler/main.go
-
-# 编译CVE详情爬虫
-go build -o cve_crawler cmd/cve_crawler/main.go
+# 编译整个项目为单个二进制文件
+go build -o cxsecurity
 ```
 
 #### 运行漏洞列表爬虫
 
 ```bash
 # 基本用法
-./crawler
+./cxsecurity exploit
 
 # 指定URL和输出文件
-./crawler -url="/exploit/85" -output="result.json"
+./cxsecurity exploit -url="/exploit/85" -output="result.json"
 
 # 只输出标题和URL字段
-./crawler -url="/exploit/85" -output="result.json" -fields="title,url"
+./cxsecurity exploit -url="/exploit/85" -output="result.json" -fields="title,url"
 
 # 输出所有字段
-./crawler -url="/exploit/85" -output="result.json" -fields="all"
+./cxsecurity exploit -url="/exploit/85" -output="result.json" -fields="all"
 ```
 
 #### 运行CVE详情爬虫
 
 ```bash
 # 基本用法
-./cve_crawler
+./cxsecurity cve
 
 # 指定CVE编号和输出文件
-./cve_crawler -cve="CVE-2007-1411" -output="cve_result.json"
+./cxsecurity cve -cve="CVE-2007-1411" -output="cve_result.json"
 
 # 只输出描述和参考链接字段
-./cve_crawler -cve="CVE-2007-1411" -output="cve_result.json" -fields="description,references"
+./cxsecurity cve -cve="CVE-2007-1411" -output="cve_result.json" -fields="description,references"
 
 # 输出所有字段
-./cve_crawler -cve="CVE-2007-1411" -output="cve_result.json" -fields="all"
+./cxsecurity cve -cve="CVE-2007-1411" -output="cve_result.json" -fields="all"
+```
+
+#### 运行漏洞详情爬虫
+
+```bash
+# 基本用法
+./cxsecurity vuln-detail
+
+# 指定漏洞ID和输出文件
+./cxsecurity vuln-detail -id="WLB-2023010123" -output="vuln_detail.json"
+
+# 只输出特定字段
+./cxsecurity vuln-detail -id="WLB-2023010123" -output="vuln_detail.json" -fields="title,risk_level,author"
 ```
 
 ### 漏洞列表爬虫命令行参数
