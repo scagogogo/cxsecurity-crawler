@@ -1,5 +1,8 @@
 # CXSecurity Crawler
 
+[![Go Tests](https://github.com/scagogogo/cxsecurity-crawler/actions/workflows/go-test.yml/badge.svg)](https://github.com/scagogogo/cxsecurity-crawler/actions/workflows/go-test.yml)
+[![codecov](https://codecov.io/gh/scagogogo/cxsecurity-crawler/branch/main/graph/badge.svg)](https://codecov.io/gh/scagogogo/cxsecurity-crawler)
+
 一个用于爬取 CXSecurity 网站漏洞数据的工具。
 
 ## 功能特性
