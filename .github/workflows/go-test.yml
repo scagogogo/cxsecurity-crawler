@@ -17,17 +17,23 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.24'
+        go-version: '1.24.2'
         check-latest: true
 
+    - name: Show Go version
+      run: go version
+
     - name: Get dependencies
-      run: go mod download
+      run: |
+        go mod tidy
+        go mod download
+        go mod verify
 
     - name: Run tests
-      run: go test -v ./...
+      run: go test -v ./... || { echo "Tests failed"; exit 1; }
 
     - name: Run tests with race detector
-      run: go test -race ./...
+      run: go test -race -v ./... || { echo "Race detector tests failed"; exit 1; }
       
     - name: Generate coverage report
       run: |
