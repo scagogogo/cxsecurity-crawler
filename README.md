@@ -31,21 +31,27 @@ go build -o cxsecurity
 # 获取漏洞列表（默认第1页）
 ./cxsecurity exploit
 
-# 获取指定ID的漏洞详情（只使用数字部分，无需WLB-前缀）
+# 获取指定ID的漏洞详情
+./cxsecurity exploit -i WLB-2024040035 -o "result.json"
+
+# 如果不指定WLB-前缀，程序也会自动添加
 ./cxsecurity exploit -i 2024040035 -o "result.json"
 
 # 只输出标题和URL字段
-./cxsecurity exploit -i 2024040035 -o "result.json" -f "title,url"
+./cxsecurity exploit -i WLB-2024040035 -o "result.json" -f "title,url"
 
 # 输出所有字段
-./cxsecurity exploit -i 2024040035 -o "result.json" -f "all"
+./cxsecurity exploit -i WLB-2024040035 -o "result.json" -f "all"
+
+# 使用静默模式（不输出到控制台，适用于API调用）
+./cxsecurity exploit -i WLB-2024040035 -o "result.json" -s
 ```
 
 > **注意**：
 > 1. 当不指定`-i`参数时，命令会爬取漏洞列表的第1页
 > 2. 当指定`-i`参数时，命令会爬取指定ID的漏洞详情页面
-> 3. 漏洞ID应该只包含数字部分，无需添加"WLB-"前缀，因为程序会自动添加。例如，要爬取 `https://cxsecurity.com/issue/WLB-2024040035` 的漏洞，正确命令是 `-i 2024040035`
-> 4. 如果使用带前缀的ID（如`-i WLB-2024040035`），将导致URL出现重复前缀（`WLB-WLB-2024040035`），可能会影响爬取结果
+> 3. 漏洞ID格式为`WLB-XXXXXXXXX`（例如`WLB-2024040035`），可以直接使用完整ID，也可以省略前缀只输入数字部分
+> 4. 请勿重复添加`WLB-`前缀，例如不要使用`WLB-WLB-2024040035`这样的格式，会导致URL错误
 > 5. 如果返回空数据或"Ups! 404 :("，说明该ID的漏洞不存在或需要特殊权限访问
 
 #### 运行CVE详情爬虫
@@ -79,7 +85,7 @@ go build -o cxsecurity
 
 ### 漏洞列表爬虫命令行参数
 
-- `-i, --id`: 要爬取的漏洞ID，例如 `85`
+- `-i, --id`: 要爬取的漏洞ID，例如 `WLB-2024040035` 或简写为 `2024040035`
 - `-o, --output`: 结果输出的文件路径，默认为 `exploit_result.json`
 - `-f, --fields`: 要输出的字段，多个字段用逗号分隔，例如 `title,url,date`。可选值包括：
   - `title`: 漏洞标题
@@ -90,6 +96,7 @@ go build -o cxsecurity
   - `author`: 作者名称
   - `author_url`: 作者页面URL
   - `all`: 输出所有字段（默认）
+- `-s, --silent`: 静默模式，不输出到标准输出，适用于API调用
 
 ### CVE详情爬虫命令行参数
 
