@@ -12,23 +12,23 @@ import (
 
 // SearchResult 表示搜索结果
 type SearchResult struct {
-	Keyword         string                // 搜索关键词
-	CurrentPage     int                   // 当前页码
-	TotalPages      int                   // 总页数
-	SortOrder       string                // 排序顺序(ASC或DESC)
-	PerPage         int                   // 每页记录数
-	Vulnerabilities []SearchVulnerability // 漏洞列表
+	Keyword         string                `json:"keyword"`         // 搜索关键词
+	CurrentPage     int                   `json:"current_page"`    // 当前页码
+	TotalPages      int                   `json:"total_pages"`     // 总页数
+	SortOrder       string                `json:"sort_order"`      // 排序顺序(ASC或DESC)
+	PerPage         int                   `json:"per_page"`        // 每页记录数
+	Vulnerabilities []SearchVulnerability `json:"vulnerabilities"` // 漏洞列表
 }
 
 // SearchVulnerability 表示搜索结果中的单个漏洞项
 type SearchVulnerability struct {
-	ID        string // 漏洞ID
-	Title     string // 标题
-	URL       string // URL
-	Date      string // 日期
-	RiskLevel string // 风险级别
-	Author    string // 作者
-	AuthorURL string // 作者URL
+	ID        string `json:"id"`         // 漏洞ID
+	Title     string `json:"title"`      // 标题
+	URL       string `json:"url"`        // URL
+	Date      string `json:"date"`       // 日期
+	RiskLevel string `json:"risk_level"` // 风险级别
+	Author    string `json:"author"`     // 作者
+	AuthorURL string `json:"author_url"` // 作者URL
 }
 
 // SearchVulnerabilities 根据关键词搜索漏洞
