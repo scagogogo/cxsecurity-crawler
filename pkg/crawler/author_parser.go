@@ -13,6 +13,28 @@ import (
 	"github.com/scagogogo/cxsecurity-crawler/pkg/model"
 )
 
+// 国家代码映射
+var countryCodeMap = map[string]string{
+	"XX": "未知",
+	"US": "美国",
+	"CN": "中国",
+	"UK": "英国",
+	"RU": "俄罗斯",
+	"FR": "法国",
+	"DE": "德国",
+	"JP": "日本",
+	"CA": "加拿大",
+	"AU": "澳大利亚",
+	"BR": "巴西",
+	"IN": "印度",
+	"IT": "意大利",
+	"ES": "西班牙",
+	"NL": "荷兰",
+	"SE": "瑞典",
+	"KR": "韩国",
+	"CH": "瑞士",
+}
+
 // AuthorParser 是解析作者资料页面的解析器
 type AuthorParser struct{}
 
@@ -49,22 +71,49 @@ func (p *AuthorParser) Parse(content string) (interface{}, error) {
 	}
 
 	// 提取国家信息
-	countryLink := doc.Find("a[href*='/best/']").First()
+	countryLink := doc.Find("a[href*='/best/'][title*='Hackers from']").First()
 	if countryLink.Length() > 0 {
+		// 获取国家代码
 		href, exists := countryLink.Attr("href")
 		if exists {
 			// 从URL中提取国家代码
 			re := regexp.MustCompile(`/best/([^/]+)/`)
 			matches := re.FindStringSubmatch(href)
 			if len(matches) > 1 {
-				result.CountryCode = strings.ToUpper(matches[1])
-				if result.CountryCode == "XX" {
-					result.Country = "Unknown"
+				countryCode := strings.ToUpper(matches[1])
+				result.CountryCode = countryCode
+
+				// 检查title提示
+				title, titleExists := countryLink.Attr("title")
+				if titleExists && strings.Contains(title, "Hackers from ") {
+					// 提取title中的国家名称
+					countryName := strings.TrimSpace(strings.Replace(title, "Hackers from ", "", 1))
+					if countryName != "xx" && countryName != "" {
+						result.Country = countryName
+					} else {
+						// 对于xx或空值，使用映射
+						if mappedName, ok := countryCodeMap[countryCode]; ok {
+							result.Country = mappedName
+						} else {
+							result.Country = "未知"
+						}
+					}
 				} else {
-					result.Country = result.CountryCode
+					// 没有title属性，使用映射
+					if mappedName, ok := countryCodeMap[countryCode]; ok {
+						result.Country = mappedName
+					} else if countryCode == "XX" {
+						result.Country = "未知"
+					} else {
+						result.Country = countryCode
+					}
 				}
 			}
 		}
+	} else {
+		// 如果没有找到符合条件的链接，设置为未知
+		result.Country = "未知"
+		result.CountryCode = "XX"
 	}
 
 	// 提取报告数量
