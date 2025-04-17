@@ -7,6 +7,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/jedib0t/go-pretty/v6/text"
+
 	"github.com/scagogogo/cxsecurity-crawler/pkg/model"
 )
 
@@ -173,16 +176,33 @@ func (c *Crawler) CrawlExploit(id string, outputPath string, fields string) erro
 			return err
 		}
 
-		// 使用表格形式展示爬取结果
-		fmt.Printf("\n爬取成功，共爬取 %d 条记录 (当前页码：%d / %d)\n\n",
-			len(result.Items), result.CurrentPage, result.TotalPages)
+		// 使用go-pretty创建美观的表格
+		t := table.NewWriter()
+		t.SetOutputMirror(os.Stdout)
 
-		// 打印表头
-		fmt.Printf("%-12s %-6s %-45s %-15s %-20s\n", "日期", "风险", "标题", "标签", "作者")
-		fmt.Println(strings.Repeat("-", 100)) // 分隔线
+		// 设置表格样式
+		t.SetStyle(table.StyleRounded)
 
-		// 打印数据行
+		// 设置表头
+		t.AppendHeader(table.Row{"日期", "风险", "标题", "标签", "作者"})
+
+		// 设置表头颜色和样式
+		t.SetColumnConfigs([]table.ColumnConfig{
+			{Number: 1, Align: text.AlignCenter, AlignHeader: text.AlignCenter, Colors: text.Colors{text.FgHiCyan, text.Bold}, WidthMax: 12},
+			{Number: 2, Align: text.AlignCenter, AlignHeader: text.AlignCenter, Colors: text.Colors{text.FgHiYellow}, WidthMax: 8},
+			{Number: 3, AlignHeader: text.AlignCenter, Colors: text.Colors{text.FgHiWhite}, WidthMax: 45},
+			{Number: 4, Align: text.AlignCenter, AlignHeader: text.AlignCenter, Colors: text.Colors{text.FgHiGreen}, WidthMax: 20},
+			{Number: 5, AlignHeader: text.AlignCenter, Colors: text.Colors{text.FgHiMagenta}, WidthMax: 20},
+		})
+
+		// 添加数据行
 		for _, item := range result.Items {
+			// 日期格式化
+			date := "未知"
+			if !item.Date.IsZero() {
+				date = item.Date.Format("2006-01-02")
+			}
+
 			// 标题可能很长，需要截断
 			title := item.Title
 			if len(title) > 42 {
@@ -192,9 +212,9 @@ func (c *Crawler) CrawlExploit(id string, outputPath string, fields string) erro
 			// 标签格式化
 			tags := "无"
 			if len(item.Tags) > 0 {
-				tagsStr := strings.Join(item.Tags, ",")
-				if len(tagsStr) > 14 {
-					tagsStr = tagsStr[:11] + "..."
+				tagsStr := strings.Join(item.Tags, ", ")
+				if len(tagsStr) > 17 {
+					tagsStr = tagsStr[:14] + "..."
 				}
 				tags = tagsStr
 			}
@@ -205,17 +225,34 @@ func (c *Crawler) CrawlExploit(id string, outputPath string, fields string) erro
 				author = author[:15] + "..."
 			}
 
-			// 日期格式化
-			date := "未知"
-			if !item.Date.IsZero() {
-				date = item.Date.Format("2006-01-02")
-			}
+			// 根据风险级别设置不同颜色
+			riskLevel := item.RiskLevel
+			var riskRow table.Row
 
-			// 打印行数据
-			fmt.Printf("%-12s %-6s %-45s %-15s %-20s\n",
-				date, item.RiskLevel, title, tags, author)
+			// 添加数据行，根据风险等级着色
+			switch strings.ToLower(riskLevel) {
+			case "high":
+				riskRow = table.Row{date, text.Colors{text.FgRed, text.Bold}.Sprint(riskLevel), title, tags, author}
+			case "med.", "medium":
+				riskRow = table.Row{date, text.Colors{text.FgYellow, text.Bold}.Sprint(riskLevel), title, tags, author}
+			case "low":
+				riskRow = table.Row{date, text.Colors{text.FgGreen, text.Bold}.Sprint(riskLevel), title, tags, author}
+			default:
+				riskRow = table.Row{date, riskLevel, title, tags, author}
+			}
+			t.AppendRow(riskRow)
 		}
-		fmt.Println() // 末尾空行
+
+		// 添加页码信息到表格底部
+		t.AppendFooter(table.Row{"", "",
+			fmt.Sprintf("总计: %d 条记录", len(result.Items)),
+			fmt.Sprintf("页码: %d/%d", result.CurrentPage, result.TotalPages),
+			""})
+
+		// 渲染表格
+		fmt.Printf("\n爬取成功！\n")
+		t.Render()
+		fmt.Println()
 	}
 
 	if outputPath != "" {
