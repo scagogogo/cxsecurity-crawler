@@ -258,7 +258,10 @@ func (c *Crawler) CrawlExploit(id string, outputPath string, fields string) erro
 				// 截断标题部分，保留ID
 				maxTitleLen := titleWidth - len(vulnID) - 6 // 为省略号留出空间
 				if maxTitleLen > 0 {
-					title = title[:maxTitleLen] + "..."
+					// 添加安全检查，确保不会超出字符串边界
+					if maxTitleLen <= len(title) {
+						title = title[:maxTitleLen] + "..."
+					}
 					idAndTitle = fmt.Sprintf("%s\n%s", text.Colors{text.FgHiCyan}.Sprint(vulnID), title)
 				}
 			}
@@ -268,7 +271,12 @@ func (c *Crawler) CrawlExploit(id string, outputPath string, fields string) erro
 			if len(item.Tags) > 0 {
 				tagsStr := strings.Join(item.Tags, ", ")
 				if len(tagsStr) > tagsWidth-3 {
-					tagsStr = tagsStr[:tagsWidth-6] + "..."
+					// 增加安全检查
+					endPos := tagsWidth - 6
+					if endPos > len(tagsStr) {
+						endPos = len(tagsStr)
+					}
+					tagsStr = tagsStr[:endPos] + "..."
 				}
 				tags = tagsStr
 			}
@@ -276,7 +284,12 @@ func (c *Crawler) CrawlExploit(id string, outputPath string, fields string) erro
 			// 作者名可能很长，需要截断
 			author := item.Author
 			if len(author) > authorWidth-3 {
-				author = author[:authorWidth-6] + "..."
+				// 增加安全检查
+				endPos := authorWidth - 6
+				if endPos > len(author) {
+					endPos = len(author)
+				}
+				author = author[:endPos] + "..."
 			}
 
 			// 根据风险级别设置不同颜色
