@@ -80,9 +80,6 @@ func (c *Crawler) CrawlVulnerabilityDetail(path string, outputPath string) (*mod
 		path = "/" + path
 	}
 
-	// 添加调试信息
-	fmt.Printf("DEBUG: CrawlVulnerabilityDetail收到路径: %s\n", path)
-
 	// 获取页面内容
 	htmlContent, err := c.client.GetPage(path)
 	if err != nil {
@@ -102,12 +99,8 @@ func (c *Crawler) CrawlVulnerabilityDetail(path string, outputPath string) (*mod
 		cleanPath := path
 		if strings.Contains(path, "/issue/WLB-WLB-") {
 			cleanPath = strings.Replace(path, "/issue/WLB-WLB-", "/issue/WLB-", 1)
-			// 添加调试信息
-			fmt.Printf("DEBUG: 发现URL前缀重复，清理后路径: %s\n", cleanPath)
 		}
 		result.URL = c.client.GetBaseURL() + cleanPath
-		// 添加调试信息
-		fmt.Printf("DEBUG: 设置URL: %s\n", result.URL)
 	}
 
 	// 保存结果
@@ -157,12 +150,8 @@ func (c *Crawler) CrawlExploit(id string, outputPath string, fields string) erro
 		// 检查ID是否已包含WLB-前缀
 		if strings.HasPrefix(id, "WLB-") {
 			path = "/issue/" + id
-			// 添加调试信息
-			fmt.Printf("DEBUG: ID已包含WLB-前缀，构建路径: %s\n", path)
 		} else {
 			path = "/issue/WLB-" + id
-			// 添加调试信息
-			fmt.Printf("DEBUG: ID不包含WLB-前缀，构建路径: %s\n", path)
 		}
 	}
 
@@ -183,11 +172,55 @@ func (c *Crawler) CrawlExploit(id string, outputPath string, fields string) erro
 		if err != nil {
 			return err
 		}
-		fmt.Printf("爬取成功，共爬取 %d 条记录\n", len(result.Items))
-		fmt.Printf("当前页码：%d，总页数：%d\n", result.CurrentPage, result.TotalPages)
+
+		// 使用表格形式展示爬取结果
+		fmt.Printf("\n爬取成功，共爬取 %d 条记录 (当前页码：%d / %d)\n\n",
+			len(result.Items), result.CurrentPage, result.TotalPages)
+
+		// 打印表头
+		fmt.Printf("%-12s %-6s %-45s %-15s %-20s\n", "日期", "风险", "标题", "标签", "作者")
+		fmt.Println(strings.Repeat("-", 100)) // 分隔线
+
+		// 打印数据行
+		for _, item := range result.Items {
+			// 标题可能很长，需要截断
+			title := item.Title
+			if len(title) > 42 {
+				title = title[:39] + "..."
+			}
+
+			// 标签格式化
+			tags := "无"
+			if len(item.Tags) > 0 {
+				tagsStr := strings.Join(item.Tags, ",")
+				if len(tagsStr) > 14 {
+					tagsStr = tagsStr[:11] + "..."
+				}
+				tags = tagsStr
+			}
+
+			// 作者名可能很长，需要截断
+			author := item.Author
+			if len(author) > 18 {
+				author = author[:15] + "..."
+			}
+
+			// 日期格式化
+			date := "未知"
+			if !item.Date.IsZero() {
+				date = item.Date.Format("2006-01-02")
+			}
+
+			// 打印行数据
+			fmt.Printf("%-12s %-6s %-45s %-15s %-20s\n",
+				date, item.RiskLevel, title, tags, author)
+		}
+		fmt.Println() // 末尾空行
 	}
 
-	fmt.Printf("结果已保存到 %s\n", outputPath)
+	if outputPath != "" {
+		fmt.Printf("结果已保存到 %s\n", outputPath)
+	}
 	return nil
 }
 

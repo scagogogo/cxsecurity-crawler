@@ -39,17 +39,11 @@ func (p *Parser) ParseListPage(htmlContent string) (*model.VulnerabilityList, er
 		if element.Is("thead") {
 			dateHeader := element.Find("tr > th font").Text()
 			formats := []string{"2006-01-02", "02.01.2006", "Jan 2, 2006"} // 尝试的日期格式
-			parsed := false
 			for _, format := range formats {
 				if parsedDate, err := time.Parse(format, strings.TrimSpace(dateHeader)); err == nil {
 					currentDate = parsedDate // 更新最近解析到的日期
-					parsed = true
-					fmt.Printf("DEBUG list_parser: Parsed date header '%s' as %s\n", dateHeader, currentDate.Format("2006-01-02"))
 					break
 				}
-			}
-			if !parsed {
-				fmt.Printf("DEBUG list_parser: Failed to parse date header '%s'\n", dateHeader)
 			}
 			return // 处理完 thead 后继续下一个元素
 		}
@@ -114,13 +108,8 @@ func (p *Parser) ParseListPage(htmlContent string) (*model.VulnerabilityList, er
 				AuthorURL: authorURL,
 			}
 			result.Items = append(result.Items, vulnerability)
-			// fmt.Printf("DEBUG: Added item - Title: %s, Date: %s\n", title, currentDate.Format("2006-01-02"))
-		} else {
-			fmt.Printf("DEBUG list_parser: Skipping item with empty title: %s\n", element.Text())
 		}
 	})
-
-	fmt.Printf("DEBUG list_parser: Total items parsed: %d\n", len(result.Items))
 
 	// 获取分页信息 - 静态解析困难
 	pagiNation := doc.Find("pagination[ng-model='currentPage']")
