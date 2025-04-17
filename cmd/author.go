@@ -35,10 +35,19 @@ var authorCmd = &cobra.Command{
 		// 创建爬虫实例
 		c := crawler.NewCrawler()
 
+		// 显示加载提示
+		if !authorSilent {
+			fmt.Printf("\n%s %s\n",
+				text.Colors{text.FgHiBlue, text.Bold}.Sprint("👤 正在获取作者信息:"),
+				text.Colors{text.FgHiWhite, text.Bold}.Sprint(authorID))
+		}
+
 		// 执行爬取
 		result, err := c.CrawlAuthor(authorID, authorOutputFile)
 		if err != nil {
-			fmt.Printf("爬取失败: %v\n", err)
+			fmt.Printf("\n%s %v\n",
+				text.Colors{text.FgRed, text.Bold}.Sprint("❌ 获取失败:"),
+				err)
 			return
 		}
 
@@ -64,7 +73,7 @@ func printAuthorResult(result *model.AuthorProfile, outputPath string) {
 
 	// 构建顶部边框
 	topBorder := "┏" + strings.Repeat("━", borderWidth) + "┓"
-	titleLine := "┃" + strings.Repeat(" ", titlePadding) + "作者信息" + strings.Repeat(" ", borderWidth-titlePadding-8) + "┃"
+	titleLine := "┃" + strings.Repeat(" ", titlePadding) + text.Colors{text.FgHiCyan, text.Bold}.Sprint("作者信息") + strings.Repeat(" ", borderWidth-titlePadding-8) + "┃"
 	middleBorder := "┣" + strings.Repeat("━", borderWidth) + "┫"
 	bottomBorder := "┗" + strings.Repeat("━", borderWidth) + "┛"
 
@@ -104,30 +113,30 @@ func printAuthorResult(result *model.AuthorProfile, outputPath string) {
 
 	// 输出基本信息
 	printLine("作者ID", result.ID, text.FgHiCyan)
-	printLine("作者名称", result.Name)
-	printLine("国家", fmt.Sprintf("%s (%s)", result.Country, result.CountryCode))
-	printLine("报告数量", fmt.Sprintf("%d", result.ReportedCount), text.FgHiGreen)
+	printLine("作者名称", result.Name, text.FgHiWhite, text.Bold)
+	printLine("国家", fmt.Sprintf("%s (%s)", result.Country, result.CountryCode), text.FgYellow)
+	printLine("报告数量", fmt.Sprintf("%d", result.ReportedCount), text.FgHiGreen, text.Bold)
 
 	// 如果有联系方式，输出联系信息
 	if result.Twitter != "" || result.Website != "" || result.ZoneH != "" {
 		fmt.Println("┣" + strings.Repeat("━", borderWidth) + "┫")
-		fmt.Printf("┃ %s%s ┃\n", text.Colors{text.Bold}.Sprint("联系方式"), strings.Repeat(" ", contentWidth-8))
+		fmt.Printf("┃ %s%s ┃\n", text.Colors{text.Bold, text.BgBlack, text.FgHiWhite}.Sprint("联系方式"), strings.Repeat(" ", contentWidth-8))
 
 		if result.Twitter != "" {
-			printLine("Twitter", result.Twitter, text.FgBlue)
+			printLine("Twitter", result.Twitter, text.FgBlue, text.Underline)
 		}
 		if result.Website != "" {
-			printLine("网站", result.Website, text.FgBlue)
+			printLine("网站", result.Website, text.FgBlue, text.Underline)
 		}
 		if result.ZoneH != "" {
-			printLine("Zone-H", result.ZoneH, text.FgBlue)
+			printLine("Zone-H", result.ZoneH, text.FgBlue, text.Underline)
 		}
 	}
 
 	// 如果有描述，输出描述信息
 	if result.Description != "" {
 		fmt.Println("┣" + strings.Repeat("━", borderWidth) + "┫")
-		fmt.Printf("┃ %s%s ┃\n", text.Colors{text.Bold}.Sprint("个人描述"), strings.Repeat(" ", contentWidth-8))
+		fmt.Printf("┃ %s%s ┃\n", text.Colors{text.Bold, text.BgBlack, text.FgHiWhite}.Sprint("个人描述"), strings.Repeat(" ", contentWidth-8))
 
 		// 处理可能的多行描述
 		descLines := strings.Split(result.Description, "\n")
@@ -137,14 +146,14 @@ func printAuthorResult(result *model.AuthorProfile, outputPath string) {
 			if padding < 0 {
 				padding = 0
 			}
-			fmt.Printf("┃ %s%s ┃\n", line, strings.Repeat(" ", padding))
+			fmt.Printf("┃ %s%s ┃\n", text.Colors{text.FgHiWhite}.Sprint(line), strings.Repeat(" ", padding))
 		}
 	}
 
 	// 输出漏洞列表
 	if len(result.Vulnerabilities) > 0 {
 		fmt.Println("┣" + strings.Repeat("━", borderWidth) + "┫")
-		fmt.Printf("┃ %s%s ┃\n", text.Colors{text.Bold}.Sprint("发布的漏洞"), strings.Repeat(" ", contentWidth-8))
+		fmt.Printf("┃ %s%s ┃\n", text.Colors{text.Bold, text.BgBlack, text.FgHiWhite}.Sprint("发布的漏洞"), strings.Repeat(" ", contentWidth-8))
 		fmt.Println("┣" + strings.Repeat("━", borderWidth) + "┫")
 
 		// 创建并配置表格
@@ -154,6 +163,15 @@ func printAuthorResult(result *model.AuthorProfile, outputPath string) {
 
 		// 设置表头
 		t.AppendHeader(table.Row{"#", "日期", "风险", "漏洞标题", "类型"})
+
+		// 设置表头样式
+		t.SetColumnConfigs([]table.ColumnConfig{
+			{Number: 1, Align: text.AlignCenter, AlignHeader: text.AlignCenter, ColorsHeader: text.Colors{text.BgBlack, text.FgHiWhite, text.Bold}},
+			{Number: 2, Align: text.AlignCenter, AlignHeader: text.AlignCenter, ColorsHeader: text.Colors{text.BgBlack, text.FgHiWhite, text.Bold}},
+			{Number: 3, Align: text.AlignCenter, AlignHeader: text.AlignCenter, ColorsHeader: text.Colors{text.BgBlack, text.FgHiWhite, text.Bold}},
+			{Number: 4, AlignHeader: text.AlignCenter, ColorsHeader: text.Colors{text.BgBlack, text.FgHiWhite, text.Bold}},
+			{Number: 5, Align: text.AlignCenter, AlignHeader: text.AlignCenter, ColorsHeader: text.Colors{text.BgBlack, text.FgHiWhite, text.Bold}},
+		})
 
 		// 添加数据行
 		for i, vuln := range result.Vulnerabilities {
@@ -177,16 +195,23 @@ func printAuthorResult(result *model.AuthorProfile, outputPath string) {
 			// 格式化漏洞类型
 			vulnType := ""
 			if vuln.IsRemote {
-				vulnType = "Remote"
+				vulnType = text.Colors{text.FgRed}.Sprint("Remote")
 			} else if vuln.IsLocal {
-				vulnType = "Local"
+				vulnType = text.Colors{text.FgBlue}.Sprint("Local")
+			}
+
+			// 高亮显示漏洞ID和标题
+			title := vuln.Title
+			if vuln.ID != "" {
+				idPart := text.Colors{text.FgHiCyan}.Sprint(vuln.ID)
+				title = fmt.Sprintf("%s: %s", idPart, title)
 			}
 
 			t.AppendRow([]interface{}{
 				i + 1,
 				date,
 				risk,
-				vuln.Title,
+				title,
 				vulnType,
 			})
 		}
@@ -201,7 +226,9 @@ func printAuthorResult(result *model.AuthorProfile, outputPath string) {
 
 	// 输出保存路径信息
 	if outputPath != "" {
-		fmt.Printf("结果已保存至: %s\n", outputPath)
+		fmt.Printf("%s %s\n",
+			text.Colors{text.FgHiGreen}.Sprint("✅ 已保存:"),
+			text.Colors{text.FgHiCyan, text.Underline}.Sprint(outputPath))
 	}
 }
 
