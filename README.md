@@ -70,22 +70,9 @@ go build -o cxsecurity
 ./cxsecurity cve -i "CVE-2007-1411" -o "cve_result.json" -f "all"
 ```
 
-#### 运行漏洞详情爬虫
-
-```bash
-# 基本用法（会提示需要指定漏洞ID）
-./cxsecurity vuln-detail
-
-# 指定漏洞ID和输出文件
-./cxsecurity vuln-detail -i "2023010123" -o "vuln_detail.json"
-
-# 只输出特定字段
-./cxsecurity vuln-detail -i "2023010123" -o "vuln_detail.json" -f "title,risk_level,author"
-```
-
 ### 漏洞列表爬虫命令行参数
 
-- `-i, --id`: 要爬取的漏洞ID，例如 `WLB-2024040035` 或简写为 `2024040035`
+- `-i, --id`: 要爬取的漏洞ID，例如 `WLB-2024040035` 或简写为 `2024040035`（不指定时爬取漏洞列表，指定时爬取漏洞详情）
 - `-o, --output`: 结果输出的文件路径，默认为 `exploit_result.json`
 - `-f, --fields`: 要输出的字段，多个字段用逗号分隔，例如 `title,url,date`。可选值包括：
   - `title`: 漏洞标题
