@@ -165,7 +165,18 @@ func (c *Crawler) CrawlExploit(id string, outputPath string, fields string) erro
 		if err != nil {
 			return err
 		}
-		fmt.Printf("爬取成功，漏洞标题: %s\n", result.Title)
+
+		// 提取漏洞ID
+		vulnID := ""
+		if strings.HasPrefix(path, "/issue/WLB-") {
+			vulnID = strings.TrimPrefix(path, "/issue/WLB-")
+		} else if strings.HasPrefix(path, "/issue/") {
+			vulnID = strings.TrimPrefix(path, "/issue/")
+		}
+
+		// 打印漏洞信息，包括ID
+		fmt.Printf("爬取成功，漏洞ID: WLB-%s\n", vulnID)
+		fmt.Printf("漏洞标题: %s\n", result.Title)
 		fmt.Printf("风险级别: %s\n", result.RiskLevel)
 		fmt.Printf("发布日期: %s\n", result.Date.Format("2006-01-02"))
 		fmt.Printf("标签数量: %d\n", len(result.Tags))
@@ -193,24 +204,24 @@ func (c *Crawler) CrawlExploit(id string, outputPath string, fields string) erro
 
 		// 动态计算各列宽度
 		// 终端宽度减去表格边框和列分隔符所占用的空间（大约是每列2个字符和表边框4个字符）
-		availableWidth := width - (4 + 2*5)
+		availableWidth := width - (4 + 2*5) // 改回5列
 
 		// 根据内容特点分配各列宽度占比
 		dateRatio := 0.10   // 日期列 - 约10%
-		riskRatio := 0.07   // 风险列 - 约7%
-		titleRatio := 0.45  // 标题列 - 约45%
-		tagsRatio := 0.18   // 标签列 - 约18%
+		riskRatio := 0.08   // 风险列 - 约8%
+		titleRatio := 0.47  // 标题列 - 约47%
+		tagsRatio := 0.15   // 标签列 - 约15%
 		authorRatio := 0.20 // 作者列 - 约20%
 
 		// 计算各列实际宽度（最小保证有10个字符）
 		dateWidth := max(12, int(float64(availableWidth)*dateRatio))
 		riskWidth := max(8, int(float64(availableWidth)*riskRatio))
-		titleWidth := max(20, int(float64(availableWidth)*titleRatio))
+		titleWidth := max(25, int(float64(availableWidth)*titleRatio))
 		tagsWidth := max(15, int(float64(availableWidth)*tagsRatio))
 		authorWidth := max(15, int(float64(availableWidth)*authorRatio))
 
 		// 设置表头
-		t.AppendHeader(table.Row{"日期", "风险", "标题", "标签", "作者"})
+		t.AppendHeader(table.Row{"日期", "风险", "ID 和标题", "标签", "作者"})
 
 		// 设置表头颜色和样式
 		t.SetColumnConfigs([]table.ColumnConfig{
@@ -223,6 +234,16 @@ func (c *Crawler) CrawlExploit(id string, outputPath string, fields string) erro
 
 		// 添加数据行
 		for _, item := range result.Items {
+			// 从URL中提取ID
+			vulnID := "未知"
+			if item.URL != "" {
+				// 通常URL格式为: https://cxsecurity.com/issue/WLB-2024040035
+				if idx := strings.Index(item.URL, "WLB-"); idx != -1 {
+					// 截取WLB-后面的所有内容
+					vulnID = item.URL[idx:]
+				}
+			}
+
 			// 日期格式化
 			date := "未知"
 			if !item.Date.IsZero() {
@@ -231,8 +252,15 @@ func (c *Crawler) CrawlExploit(id string, outputPath string, fields string) erro
 
 			// 标题可能很长，需要截断
 			title := item.Title
-			if len(title) > titleWidth-3 {
-				title = title[:titleWidth-6] + "..."
+			// 组合ID和标题
+			idAndTitle := fmt.Sprintf("%s\n%s", text.Colors{text.FgHiCyan}.Sprint(vulnID), title)
+			if len(idAndTitle) > titleWidth-3 {
+				// 截断标题部分，保留ID
+				maxTitleLen := titleWidth - len(vulnID) - 6 // 为省略号留出空间
+				if maxTitleLen > 0 {
+					title = title[:maxTitleLen] + "..."
+					idAndTitle = fmt.Sprintf("%s\n%s", text.Colors{text.FgHiCyan}.Sprint(vulnID), title)
+				}
 			}
 
 			// 标签格式化
@@ -258,13 +286,13 @@ func (c *Crawler) CrawlExploit(id string, outputPath string, fields string) erro
 			// 添加数据行，根据风险等级着色
 			switch strings.ToLower(riskLevel) {
 			case "high":
-				riskRow = table.Row{date, text.Colors{text.FgRed, text.Bold}.Sprint(riskLevel), text.Colors{text.FgWhite, text.Bold}.Sprint(title), tags, author}
+				riskRow = table.Row{date, text.Colors{text.FgRed, text.Bold}.Sprint(riskLevel), idAndTitle, tags, author}
 			case "med.", "medium":
-				riskRow = table.Row{date, text.Colors{text.FgYellow, text.Bold}.Sprint(riskLevel), text.Colors{text.FgWhite}.Sprint(title), tags, author}
+				riskRow = table.Row{date, text.Colors{text.FgYellow, text.Bold}.Sprint(riskLevel), idAndTitle, tags, author}
 			case "low":
-				riskRow = table.Row{date, text.Colors{text.FgGreen, text.Bold}.Sprint(riskLevel), text.Colors{text.FgWhite}.Sprint(title), tags, author}
+				riskRow = table.Row{date, text.Colors{text.FgGreen, text.Bold}.Sprint(riskLevel), idAndTitle, tags, author}
 			default:
-				riskRow = table.Row{date, riskLevel, text.Colors{text.FgWhite}.Sprint(title), tags, author}
+				riskRow = table.Row{date, riskLevel, idAndTitle, tags, author}
 			}
 			t.AppendRow(riskRow)
 		}
