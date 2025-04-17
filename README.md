@@ -57,30 +57,30 @@ go build -o cxsecurity
 #### 运行CVE详情爬虫
 
 ```bash
-# 基本用法
+# 基本用法（会提示需要指定CVE编号）
 ./cxsecurity cve
 
 # 指定CVE编号和输出文件
-./cxsecurity cve --cve="CVE-2007-1411" -o "cve_result.json"
+./cxsecurity cve -i "CVE-2007-1411" -o "cve_result.json"
 
 # 只输出描述和参考链接字段
-./cxsecurity cve --cve="CVE-2007-1411" -o "cve_result.json" -f "description,references"
+./cxsecurity cve -i "CVE-2007-1411" -o "cve_result.json" -f "description,references"
 
 # 输出所有字段
-./cxsecurity cve --cve="CVE-2007-1411" -o "cve_result.json" -f "all"
+./cxsecurity cve -i "CVE-2007-1411" -o "cve_result.json" -f "all"
 ```
 
 #### 运行漏洞详情爬虫
 
 ```bash
-# 基本用法
+# 基本用法（会提示需要指定漏洞ID）
 ./cxsecurity vuln-detail
 
 # 指定漏洞ID和输出文件
-./cxsecurity vuln-detail --id="WLB-2023010123" -o "vuln_detail.json"
+./cxsecurity vuln-detail -i "2023010123" -o "vuln_detail.json"
 
 # 只输出特定字段
-./cxsecurity vuln-detail --id="WLB-2023010123" -o "vuln_detail.json" -f "title,risk_level,author"
+./cxsecurity vuln-detail -i "2023010123" -o "vuln_detail.json" -f "title,risk_level,author"
 ```
 
 ### 漏洞列表爬虫命令行参数
@@ -100,9 +100,9 @@ go build -o cxsecurity
 
 ### CVE详情爬虫命令行参数
 
-- `-cve`: 要爬取的CVE编号，默认为 `CVE-2007-1411`
-- `-output`: 结果输出的文件路径，默认为 `cve_output.json`
-- `-fields`: 要输出的字段，多个字段用逗号分隔，例如 `cve_id,description,references`。可选值包括：
+- `-i, --id`: 要爬取的CVE编号，例如 `CVE-2007-1411`（必须参数）
+- `-o, --output`: 结果输出的文件路径，默认为 `cve_output.json`
+- `-f, --fields`: 要输出的字段，多个字段用逗号分隔，例如 `cve_id,description,references`。可选值包括：
   - `cve_id`: CVE编号
   - `published`: 发布日期
   - `modified`: 最后修改日期
@@ -120,7 +120,7 @@ go build -o cxsecurity
   - `affected_software`: 受影响的软件列表
   - `references`: 参考链接
   - `related_vulnerabilities`: 相关漏洞
-  - `all`: 输出所有字段
+  - `all`: 输出所有字段（默认）
 
 ## API 文档
 
