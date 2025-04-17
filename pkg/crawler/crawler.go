@@ -197,6 +197,44 @@ func (c *Crawler) CrawlExploit(id string, outputPath string, fields string) (int
 	}
 }
 
+// CrawlAuthor 爬取作者信息页面并保存结果
+func (c *Crawler) CrawlAuthor(authorID string, outputPath string) (*model.AuthorProfile, error) {
+	// 构建URL路径
+	path := fmt.Sprintf("/author/%s/1/", authorID)
+
+	// 获取页面内容
+	htmlContent, err := c.client.GetPage(path)
+	if err != nil {
+		return nil, fmt.Errorf("获取作者页面内容失败: %w", err)
+	}
+
+	// 解析页面内容
+	authorParser := NewAuthorParser()
+	resultInterface, err := authorParser.Parse(htmlContent)
+	if err != nil {
+		return nil, fmt.Errorf("解析作者页面内容失败: %w", err)
+	}
+
+	result, ok := resultInterface.(*model.AuthorProfile)
+	if !ok {
+		return nil, fmt.Errorf("解析结果类型错误")
+	}
+
+	// 如果未成功解析到ID，使用输入的作者ID
+	if result.ID == "" {
+		result.ID = authorID
+	}
+
+	// 保存结果
+	if outputPath != "" {
+		if err := c.saveAuthorResult(result, outputPath); err != nil {
+			return nil, fmt.Errorf("保存作者信息结果失败: %w", err)
+		}
+	}
+
+	return result, nil
+}
+
 // saveResult 将爬取结果保存到文件中
 func (c *Crawler) saveResult(result *model.VulnerabilityList, outputPath string) error {
 	// 创建目录
@@ -247,6 +285,30 @@ func (c *Crawler) saveVulnerabilityDetailResult(result *model.Vulnerability, out
 
 // saveCveDetailResult 将CVE详情结果保存到文件中
 func (c *Crawler) saveCveDetailResult(result *model.CveDetail, outputPath string) error {
+	// 创建目录
+	dir := filepath.Dir(outputPath)
+	if dir != "" && dir != "." {
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			return err
+		}
+	}
+
+	// 将结果序列化为JSON
+	data, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	// 写入文件
+	if err := os.WriteFile(outputPath, data, 0644); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// saveAuthorResult 将作者信息结果保存到文件中
+func (c *Crawler) saveAuthorResult(result *model.AuthorProfile, outputPath string) error {
 	// 创建目录
 	dir := filepath.Dir(outputPath)
 	if dir != "" && dir != "." {

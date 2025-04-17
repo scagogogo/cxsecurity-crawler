@@ -70,6 +70,19 @@ go build -o cxsecurity
 ./cxsecurity cve -i "CVE-2007-1411" -o "cve_result.json" -f "all"
 ```
 
+#### 爬取作者信息
+
+```bash
+# 基本用法（会提示需要指定作者ID）
+./cxsecurity author
+
+# 指定作者ID和输出文件
+./cxsecurity author -i "m4xth0r" -o "author_result.json"
+
+# 使用静默模式
+./cxsecurity author -i "m4xth0r" -o "author_result.json" -s
+```
+
 ### 漏洞列表爬虫命令行参数
 
 - `-i, --id`: 要爬取的漏洞ID，例如 `WLB-2024040035` 或简写为 `2024040035`（不指定时爬取漏洞列表，指定时爬取漏洞详情）
@@ -108,6 +121,12 @@ go build -o cxsecurity
   - `references`: 参考链接
   - `related_vulnerabilities`: 相关漏洞
   - `all`: 输出所有字段（默认）
+
+### 作者信息爬虫命令行参数
+
+- `-i, --id`: 要爬取的作者ID，例如 `m4xth0r`（必须参数）
+- `-o, --output`: 结果输出的文件路径，默认为 `author_result.json`
+- `-s, --silent`: 静默模式，不输出到标准输出，适用于API调用
 
 ## API 文档
 
