@@ -11,6 +11,7 @@ import (
 )
 
 // SearchResult 表示搜索结果
+// 包含搜索的元数据（关键词、分页信息等）和漏洞列表
 type SearchResult struct {
 	Keyword         string                `json:"keyword"`         // 搜索关键词
 	CurrentPage     int                   `json:"current_page"`    // 当前页码
@@ -21,23 +22,87 @@ type SearchResult struct {
 }
 
 // SearchVulnerability 表示搜索结果中的单个漏洞项
+// 包含漏洞的基本信息，如ID、标题、URL等
 type SearchVulnerability struct {
-	ID        string `json:"id"`         // 漏洞ID
-	Title     string `json:"title"`      // 标题
-	URL       string `json:"url"`        // URL
-	Date      string `json:"date"`       // 日期
-	RiskLevel string `json:"risk_level"` // 风险级别
-	Author    string `json:"author"`     // 作者
-	AuthorURL string `json:"author_url"` // 作者URL
+	ID        string `json:"id"`         // 漏洞ID，例如 WLB-2024-0001
+	Title     string `json:"title"`      // 漏洞标题
+	URL       string `json:"url"`        // 漏洞详情页URL
+	Date      string `json:"date"`       // 发布日期
+	RiskLevel string `json:"risk_level"` // 风险级别（High/Medium/Low）
+	Author    string `json:"author"`     // 作者名称
+	AuthorURL string `json:"author_url"` // 作者主页URL
 }
 
 // SearchVulnerabilities 根据关键词搜索漏洞
+// 这是一个简化版的搜索方法，使用默认的搜索参数：
+// - 每页10条记录
+// - 降序排序（最新的在前）
+//
+// 参数:
+//   - keyword: 搜索关键词，支持多个关键词，用空格分隔
+//   - page: 页码，从1开始
+//   - outputPath: 结果保存路径，为空则不保存
+//
+// 返回值:
+//   - *SearchResult: 搜索结果，包含漏洞列表和分页信息
+//   - error: 搜索过程中的错误
+//
+// 示例:
+//
+//	// 搜索包含"XSS"的漏洞
+//	result, err := crawler.SearchVulnerabilities("XSS", 1, "xss_vulns.json")
+//	if err != nil {
+//	    log.Fatal(err)
+//	}
+//	fmt.Printf("Found %d vulnerabilities\n", len(result.Vulnerabilities))
 func (c *Crawler) SearchVulnerabilities(keyword string, page int, outputPath string) (*SearchResult, error) {
 	// 使用默认值调用高级搜索方法
 	return c.SearchVulnerabilitiesAdvanced(keyword, page, 10, "DESC", outputPath)
 }
 
-// SearchVulnerabilitiesAdvanced 高级搜索功能
+// SearchVulnerabilitiesAdvanced 提供高级搜索功能
+// 支持自定义每页记录数和排序顺序，适用于需要精确控制搜索结果的场景。
+//
+// 功能：
+// 1. 支持多关键词搜索
+// 2. 自定义每页记录数
+// 3. 自定义排序顺序
+// 4. 支持分页
+// 5. 可选结果保存
+//
+// 参数:
+//   - keyword: 搜索关键词，支持多个关键词，用空格分隔
+//   - page: 页码，从1开始
+//   - perPage: 每页记录数，支持10或30
+//   - sortOrder: 排序顺序，支持"ASC"（升序）或"DESC"（降序）
+//   - outputPath: 结果保存路径，为空则不保存
+//
+// 返回值:
+//   - *SearchResult: 搜索结果，包含：
+//   - 搜索元数据（关键词、分页信息等）
+//   - 漏洞列表（ID、标题、URL等）
+//   - error: 搜索过程中的错误
+//
+// 示例:
+//
+//	// 搜索包含"SQL injection"的漏洞，每页30条，按时间升序
+//	result, err := crawler.SearchVulnerabilitiesAdvanced(
+//	    "SQL injection",
+//	    1,        // 第一页
+//	    30,       // 每页30条
+//	    "ASC",    // 升序排序
+//	    "sql_vulns.json",
+//	)
+//	if err != nil {
+//	    log.Fatal(err)
+//	}
+//	fmt.Printf("Found %d vulnerabilities\n", len(result.Vulnerabilities))
+//
+// 注意事项：
+// 1. perPage只支持10或30，其他值会被设为默认值10
+// 2. sortOrder只支持"ASC"或"DESC"，其他值会被设为默认值"DESC"
+// 3. 页码小于1会被设为1
+// 4. 搜索结果会被缓存，相同的搜索参数会返回相同的结果
 func (c *Crawler) SearchVulnerabilitiesAdvanced(keyword string, page int, perPage int, sortOrder string, outputPath string) (*SearchResult, error) {
 	// 构建搜索URL，格式为: /search/wlb/DESC/AND/结束日期.开始日期/页码/每页数量/关键词/
 	// 结束日期使用当前日期，开始日期使用一个固定的早期日期

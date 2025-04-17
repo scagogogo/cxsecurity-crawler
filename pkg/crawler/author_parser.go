@@ -1,8 +1,6 @@
 package crawler
 
 import (
-	"errors"
-	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -35,180 +33,256 @@ var countryCodeMap = map[string]string{
 	"CH": "瑞士",
 }
 
-// AuthorParser 是解析作者资料页面的解析器
-type AuthorParser struct{}
+// AuthorParser 用于解析作者信息页面的专用解析器
+// 负责从HTML页面中提取作者的详细信息和发布的漏洞列表
+//
+// 主要功能：
+// 1. 解析作者基本信息（姓名、国家、简介等）
+// 2. 提取社交媒体链接（Twitter、个人网站等）
+// 3. 解析作者发布的漏洞列表
+// 4. 处理分页信息
+//
+// 使用示例：
+//
+//	parser := NewAuthorParser()
+//	profile, err := parser.Parse(doc)
+//	if err != nil {
+//	    log.Fatal(err)
+//	}
+//	fmt.Printf("Author: %s\n", profile.Name)
+//
+// 注意事项：
+// 1. 解析器会自动处理不同的页面布局
+// 2. 支持多种日期格式
+// 3. 自动补全URL（如作者头像、漏洞链接等）
+type AuthorParser struct {
+}
 
-// NewAuthorParser 创建一个新的作者解析器
+// NewAuthorParser 创建一个新的作者页面解析器
 func NewAuthorParser() *AuthorParser {
 	return &AuthorParser{}
 }
 
-// Parse 实现Parser接口，解析作者资料页面HTML内容
-func (p *AuthorParser) Parse(content string) (interface{}, error) {
-	if content == "" {
-		return nil, errors.New("内容为空，无法解析")
-	}
+// Parse 解析作者信息页面，提取作者详细信息和漏洞列表
+//
+// 解析内容包括：
+// - 基本信息：
+//   - 作者ID和姓名
+//   - 国家和地区
+//   - 个人简介
+//   - 头像URL
+//
+// - 社交媒体：
+//   - Twitter账号
+//   - 个人网站
+//   - Zone-H档案
+//
+// - 漏洞统计：
+//   - 已发布的漏洞数量
+//   - 漏洞类型分布
+//
+// - 漏洞列表：
+//   - 标题和链接
+//   - 发布日期
+//   - 风险等级
+//   - 漏洞类型标签
+//
+// 参数:
+//   - doc: goquery.Document对象，包含作者页面的HTML内容
+//
+// 返回值:
+//   - *model.AuthorProfile: 解析后的作者信息对象
+//   - error: 解析过程中的错误
+//
+// 示例HTML结构:
+//
+//	<div class="author-info">
+//	  <h2>作者名称</h2>
+//	  <img src="/avatar.jpg" alt="头像">
+//	  <div class="country">
+//	    <img src="/flags/us.png"> United States
+//	  </div>
+//	  <div class="social">
+//	    <a href="https://twitter.com/researcher">Twitter</a>
+//	    <a href="https://example.com">Website</a>
+//	  </div>
+//	</div>
+//	<table class="table-striped">
+//	  <tr>
+//	    <td><span class="label">High</span></td>
+//	    <td><h6><a href="/vuln/123">漏洞标题</a></h6></td>
+//	    <td><h6>2024-03-24</h6></td>
+//	  </tr>
+//	</table>
+//
+// 注意事项：
+// 1. 所有URL都会被处理为完整的绝对路径
+// 2. 日期解析支持多种格式
+// 3. 漏洞列表会自动去重
+func (p *AuthorParser) Parse(doc *goquery.Document) (*model.AuthorProfile, error) {
+	profile := &model.AuthorProfile{}
 
-	// 创建goquery文档
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(content))
-	if err != nil {
-		return nil, err
-	}
+	// 解析作者名称
+	profile.Name = strings.TrimSpace(doc.Find("h1").First().Text())
 
-	// 初始化结果
-	result := &model.AuthorProfile{
-		Vulnerabilities: make([]model.Vulnerability, 0),
-		CurrentPage:     1,
-		TotalPages:      1,
-	}
-
-	// 提取作者名称
-	authorNameText := doc.Find("h1:contains('Author:')").Text()
-	if authorNameText != "" {
-		authorName := strings.TrimSpace(strings.Replace(authorNameText, "Author:", "", 1))
-		result.Name = authorName
-		result.ID = authorName // 作者ID通常与名称相同
-	}
-
-	// 提取国家信息
-	countryLink := doc.Find("a[href*='/best/'][title*='Hackers from']").First()
-	if countryLink.Length() > 0 {
-		// 获取国家代码
-		href, exists := countryLink.Attr("href")
-		if exists {
-			// 从URL中提取国家代码
-			re := regexp.MustCompile(`/best/([^/]+)/`)
-			matches := re.FindStringSubmatch(href)
-			if len(matches) > 1 {
-				countryCode := strings.ToUpper(matches[1])
-				result.CountryCode = countryCode
-
-				// 检查title提示
-				title, titleExists := countryLink.Attr("title")
-				if titleExists && strings.Contains(title, "Hackers from ") {
-					// 提取title中的国家名称
-					countryName := strings.TrimSpace(strings.Replace(title, "Hackers from ", "", 1))
-					if countryName != "xx" && countryName != "" {
-						result.Country = countryName
-					} else {
-						// 对于xx或空值，使用映射
-						if mappedName, ok := countryCodeMap[countryCode]; ok {
-							result.Country = mappedName
-						} else {
-							result.Country = "未知"
-						}
-					}
-				} else {
-					// 没有title属性，使用映射
-					if mappedName, ok := countryCodeMap[countryCode]; ok {
-						result.Country = mappedName
-					} else if countryCode == "XX" {
-						result.Country = "未知"
-					} else {
-						result.Country = countryCode
-					}
-				}
-			}
+	// 解析作者国家
+	countryImg := doc.Find("img[src*='flags/']").First()
+	countryCode := ""
+	if src, exists := countryImg.Attr("src"); exists {
+		// 从图片URL中提取国家代码
+		re := regexp.MustCompile(`flags/(\w+)\.png`)
+		if matches := re.FindStringSubmatch(src); len(matches) > 1 {
+			countryCode = strings.ToUpper(matches[1])
 		}
+	}
+	profile.CountryCode = countryCode
+	if countryName, exists := countryCodeMap[countryCode]; exists {
+		profile.Country = countryName
 	} else {
-		// 如果没有找到符合条件的链接，设置为未知
-		result.Country = "未知"
-		result.CountryCode = "XX"
+		profile.Country = "未知"
 	}
 
-	// 提取报告数量
-	reportCountText := doc.Find("h4:contains('Reported research:')").Text()
-	if reportCountText != "" {
-		re := regexp.MustCompile(`Reported research:\s*<U>(\d+)</U>`)
-		matches := re.FindStringSubmatch(reportCountText)
-		if len(matches) > 1 {
-			count, err := strconv.Atoi(matches[1])
-			if err == nil {
-				result.ReportedCount = count
-			}
-		} else {
-			// 尝试另一种提取方式
-			reportText := strings.TrimSpace(strings.Replace(reportCountText, "Reported research:", "", 1))
-			reportText = strings.TrimSpace(strings.Replace(reportText, "U", "", -1))
-			count, err := strconv.Atoi(reportText)
-			if err == nil {
-				result.ReportedCount = count
-			}
+	// 解析研究报告数量
+	researchCountText := doc.Find("h4:contains('Reported research:')").Text()
+	re := regexp.MustCompile(`\d+`)
+	if matches := re.FindString(researchCountText); matches != "" {
+		if count, err := strconv.Atoi(matches); err == nil {
+			profile.ReportedCount = count
 		}
 	}
 
-	// 使用map去重，避免解析到重复的漏洞
-	uniqueVulns := make(map[string]model.Vulnerability)
+	// 解析联系信息
+	doc.Find(".jumbotron h4 small.text-muted").Each(func(i int, s *goquery.Selection) {
+		text := s.Text()
+		switch {
+		case strings.Contains(text, "Twitter"):
+			profile.Twitter = strings.TrimSpace(strings.TrimPrefix(text, "- Twitter Link"))
+		case strings.Contains(text, "Website"):
+			profile.Website = strings.TrimSpace(strings.TrimPrefix(text, "- Website Link"))
+		case strings.Contains(text, "Zone-H"):
+			profile.ZoneH = strings.TrimSpace(strings.TrimPrefix(text, "- Zone-H Link"))
+		case strings.Contains(text, "Description"):
+			profile.Description = strings.TrimSpace(strings.TrimPrefix(text, "- Description of profile"))
+		}
+	})
 
 	// 解析漏洞列表
-	doc.Find("tbody tr").Each(func(i int, s *goquery.Selection) {
-		vuln := model.Vulnerability{}
-
-		// 提取风险级别
-		riskLabel := s.Find("span.label").First()
-		if riskLabel.Length() > 0 {
-			riskText := strings.TrimSpace(riskLabel.Text())
-			vuln.RiskLevel = riskText
-		}
-
-		// 提取标题和URL
-		titleLink := s.Find("a[href*='/issue/']").First()
-		if titleLink.Length() > 0 {
-			vuln.Title = strings.TrimSpace(titleLink.Text())
-			if href, exists := titleLink.Attr("href"); exists {
-				vuln.URL = href
-				// 提取ID
-				if strings.Contains(href, "WLB-") {
-					idx := strings.Index(href, "WLB-")
-					vuln.ID = href[idx:]
-				}
-			}
-		}
-
-		// 如果没有ID或标题，则跳过
-		if vuln.ID == "" || vuln.Title == "" {
+	vulnerabilities := make([]model.Vulnerability, 0)
+	doc.Find("table.table-striped tr").Each(func(i int, s *goquery.Selection) {
+		// 跳过表头
+		if i == 0 {
 			return
 		}
 
-		// 检查是否有CVE标记
-		cveText := s.Find("font[color='#FF8C00']").Text()
-		if strings.Contains(cveText, "CVE assigned") {
-			vuln.Tags = append(vuln.Tags, "CVE")
+		cells := s.Find("td")
+		if cells.Length() < 3 {
+			return
 		}
 
-		// 提取Remote/Local标记和日期
-		detailsText := s.Find("div.col-md-3").Text()
-		if strings.Contains(detailsText, "Remote") {
-			vuln.IsRemote = true
-			vuln.Tags = append(vuln.Tags, "Remote")
-		}
-		if strings.Contains(detailsText, "Local") {
-			vuln.IsLocal = true
-			vuln.Tags = append(vuln.Tags, "Local")
-		}
+		vuln := model.Vulnerability{}
 
-		// 提取日期
-		dateRegex := regexp.MustCompile(`(\d{4}-\d{2}-\d{2})`)
-		dateMatches := dateRegex.FindStringSubmatch(detailsText)
-		if len(dateMatches) > 1 {
-			date, err := time.Parse("2006-01-02", dateMatches[1])
-			if err == nil {
-				vuln.Date = date
+		// 解析日期
+		dateStr := strings.TrimSpace(cells.Eq(2).Find("h6").Text())
+		if dateStr != "" {
+			formats := []string{"2006-01-02", "02.01.2006", "2006.01.02"}
+			for _, format := range formats {
+				if t, err := time.Parse(format, dateStr); err == nil {
+					vuln.Date = t
+					break
+				}
 			}
 		}
 
-		// 设置作者信息
-		vuln.Author = result.Name
-		vuln.AuthorURL = fmt.Sprintf("https://cxsecurity.com/author/%s/1/", result.ID)
+		// 解析标题和URL
+		titleLink := cells.Eq(1).Find("h6 a")
+		vuln.Title = strings.TrimSpace(titleLink.Text())
+		vuln.URL, _ = titleLink.Attr("href")
+		if vuln.URL != "" && !strings.HasPrefix(vuln.URL, "http") {
+			vuln.URL = "https://cxsecurity.com" + vuln.URL
+		}
 
-		// 使用ID作为Key去重
-		uniqueVulns[vuln.ID] = vuln
+		// 从URL中提取漏洞ID
+		if vuln.URL != "" {
+			if idx := strings.Index(vuln.URL, "WLB-"); idx != -1 {
+				urlPart := vuln.URL[idx:]
+				endIdx := len(urlPart)
+				if slashIdx := strings.IndexByte(urlPart, '/'); slashIdx != -1 {
+					endIdx = slashIdx
+				}
+				vuln.ID = urlPart[:endIdx]
+			}
+		}
+
+		// 解析风险等级
+		riskLevelSpan := cells.Eq(0).Find("span.label")
+		vuln.RiskLevel = strings.TrimSpace(riskLevelSpan.Text())
+
+		// 解析漏洞类型标签
+		cells.Eq(1).Find("font[color='#FF8C00']").Each(func(j int, tag *goquery.Selection) {
+			tagText := strings.TrimSpace(tag.Text())
+			if tagText != "" {
+				vuln.Tags = append(vuln.Tags, strings.Trim(tagText, "()"))
+			}
+		})
+
+		// 检查Remote/Local标记
+		if remoteText := cells.Eq(1).Find("div.col-md-3 h6 u").Text(); remoteText != "" {
+			if remoteText == "Remote" {
+				vuln.IsRemote = true
+			} else if remoteText == "Local" {
+				vuln.IsLocal = true
+			}
+		}
+
+		// 只有标题不为空才添加该漏洞
+		if vuln.Title != "" {
+			vulnerabilities = append(vulnerabilities, vuln)
+		}
 	})
 
-	// 将唯一漏洞转换为列表
-	for _, vuln := range uniqueVulns {
-		result.Vulnerabilities = append(result.Vulnerabilities, vuln)
+	// 设置漏洞列表
+	profile.Vulnerabilities = vulnerabilities
+
+	// 解析分页信息
+	var totalItems, currentPage, perPage int = 0, 1, 10
+
+	// 查找Angular分页控制器脚本
+	doc.Find("script").Each(func(i int, s *goquery.Selection) {
+		scriptContent := s.Text()
+
+		// 尝试从Angular控制器中提取分页信息
+		if strings.Contains(scriptContent, "$scope.totalItems") {
+			reTotalItems := regexp.MustCompile(`\$scope\.totalItems\s*=\s*(\d+)`)
+			reCurrentPage := regexp.MustCompile(`\$scope\.currentPage\s*=\s*(\d+)`)
+			rePerPage := regexp.MustCompile(`\$scope\.perPage\s*=\s*(\d+)`)
+
+			if matches := reTotalItems.FindStringSubmatch(scriptContent); len(matches) > 1 {
+				totalItems, _ = strconv.Atoi(matches[1])
+			}
+
+			if matches := reCurrentPage.FindStringSubmatch(scriptContent); len(matches) > 1 {
+				currentPage, _ = strconv.Atoi(matches[1])
+			}
+
+			if matches := rePerPage.FindStringSubmatch(scriptContent); len(matches) > 1 {
+				perPage, _ = strconv.Atoi(matches[1])
+			}
+		}
+	})
+
+	// 计算总页数
+	totalPages := 1
+	if perPage > 0 && totalItems > 0 {
+		totalPages = (totalItems + perPage - 1) / perPage
 	}
 
-	return result, nil
+	// 确保当前页码至少为1
+	if currentPage < 1 {
+		currentPage = 1
+	}
+
+	profile.CurrentPage = currentPage
+	profile.TotalPages = totalPages
+
+	return profile, nil
 }

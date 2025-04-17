@@ -36,3 +36,36 @@ func (a AuthorProfile) MarshalJSON() ([]byte, error) {
 
 	return json.Marshal(aux)
 }
+
+// Author 表示一个作者的信息
+type Author struct {
+	// 作者名称
+	Name string `json:"name"`
+
+	// 作者所在国家
+	Country string `json:"country"`
+
+	// 作者报告的研究数量
+	ReportedResearchCount int `json:"reported_research_count"`
+
+	// 作者发布的漏洞列表
+	Vulnerabilities []AuthorVulnerability `json:"vulnerabilities"`
+}
+
+// AuthorVulnerability 表示作者发布的一个漏洞
+type AuthorVulnerability struct {
+	// 漏洞发布日期
+	Date string `json:"date"`
+
+	// 漏洞标题
+	Title string `json:"title"`
+
+	// 漏洞详情页URL
+	URL string `json:"url"`
+
+	// 漏洞风险等级
+	RiskLevel string `json:"risk_level"`
+
+	// 漏洞标签
+	Tags []string `json:"tags"`
+}

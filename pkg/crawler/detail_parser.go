@@ -11,7 +11,58 @@ import (
 	"github.com/scagogogo/cxsecurity-crawler/pkg/model"
 )
 
-// ParseVulnerabilityDetailPage 解析漏洞详情页面
+// ParseVulnerabilityDetailPage 解析漏洞详情页面，提取漏洞的完整信息
+//
+// 解析内容包括：
+// - 漏洞标题：从h4标签或panel-body中提取
+// - 风险等级：从well-sm中提取Risk标签
+// - CVE编号：匹配CVE-YYYY-XXXXX格式
+// - CWE编号：匹配CWE-XXX格式
+// - 本地/远程利用：解析Local和Remote标签的Yes/No值
+// - 发布日期：支持多种日期格式（YYYY.MM.DD、YYYY-MM-DD等）
+// - 作者信息：包括作者名称和个人主页URL
+// - 其他标签：漏洞类型、平台等信息
+//
+// 参数:
+//   - htmlContent: 详情页面的HTML内容
+//
+// 返回值:
+//   - *model.Vulnerability: 解析出的漏洞详情对象
+//   - error: 解析过程中的错误
+//
+// 示例HTML结构:
+//
+//	<div class="panel-body">
+//	  <h4><B>漏洞标题</B></h4>
+//	  <div class="well-sm">
+//	    <label>Risk:</label> <span class="label">High</span>
+//	  </div>
+//	  <div class="well-sm">
+//	    <label>CVE:</label> <a href="/cveshow/CVE-2024-1234">CVE-2024-1234</a>
+//	  </div>
+//	  <div class="well-sm">
+//	    <label>CWE:</label> <a href="/cwe/79">CWE-79</a>
+//	  </div>
+//	  <div class="well-sm">
+//	    <label>Local:</label> <b>Yes</b>
+//	  </div>
+//	  <div class="well-sm">
+//	    <label>Remote:</label> <b>No</b>
+//	  </div>
+//	  <div class="well-sm">
+//	    <label>Credit:</label> <a href="/author/researcher">研究者</a>
+//	  </div>
+//	  <div class="well-sm">
+//	    <span class="label">Web</span>
+//	    <span class="label">PHP</span>
+//	  </div>
+//	</div>
+//
+// 注意事项：
+// 1. 标题提取有备选方案，以应对不同的HTML结构
+// 2. 日期解析支持多种格式，按优先级尝试
+// 3. 标签会自动去重，避免重复
+// 4. 作者URL会根据需要处理为完整路径
 func (p *Parser) ParseVulnerabilityDetailPage(htmlContent string) (*model.Vulnerability, error) {
 	if strings.TrimSpace(htmlContent) == "" {
 		return nil, fmt.Errorf("HTML content is empty")

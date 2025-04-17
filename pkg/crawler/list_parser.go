@@ -13,6 +13,55 @@ import (
 )
 
 // ParseListPage 解析漏洞列表页面和搜索结果页面
+// 支持两种页面格式：
+// 1. 标准漏洞列表页面（按日期分组的漏洞列表）
+// 2. 搜索结果页面（带分页的漏洞列表）
+//
+// 解析内容包括：
+// - 漏洞标题和URL
+// - 发布日期
+// - 风险等级
+// - 作者信息
+// - CVE/CWE编号（如果存在）
+// - 标签信息
+//
+// 参数:
+//   - htmlContent: 页面的HTML内容
+//
+// 返回值:
+//   - *model.VulnerabilityList: 解析出的漏洞列表，包含漏洞条目和分页信息
+//   - error: 解析过程中的错误
+//
+// 示例HTML结构（标准列表页）:
+//
+//	<table class="table-striped">
+//	  <thead>
+//	    <tr><th><font>2024-04-15</font></th></tr>
+//	  </thead>
+//	  <tbody>
+//	    <tr>
+//	      <td><span class="label">High</span></td>
+//	      <td>
+//	        <div class="row">
+//	          <div class="col-md-7">
+//	            <a href="/issue/WLB-2024040015">漏洞标题</a>
+//	          </div>
+//	        </div>
+//	      </td>
+//	    </tr>
+//	  </tbody>
+//	</table>
+//
+// 示例HTML结构（搜索结果页）:
+//
+//	<table width="100%" border="0" cellpadding="0" cellspacing="0">
+//	  <tr>
+//	    <td><span class="label">High</span></td>
+//	    <td><h6><a href="/issue/WLB-2024040015">漏洞标题</a></h6></td>
+//	    <td><span class="label">24.03.2024</span></td>
+//	    <td><a href="/author/researcher">作者</a></td>
+//	  </tr>
+//	</table>
 func (p *Parser) ParseListPage(htmlContent string) (*model.VulnerabilityList, error) {
 	if strings.TrimSpace(htmlContent) == "" {
 		return nil, fmt.Errorf("HTML content is empty")
