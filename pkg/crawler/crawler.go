@@ -80,6 +80,9 @@ func (c *Crawler) CrawlVulnerabilityDetail(path string, outputPath string) (*mod
 		path = "/" + path
 	}
 
+	// 添加调试信息
+	fmt.Printf("DEBUG: CrawlVulnerabilityDetail收到路径: %s\n", path)
+
 	// 获取页面内容
 	htmlContent, err := c.client.GetPage(path)
 	if err != nil {
@@ -93,8 +96,18 @@ func (c *Crawler) CrawlVulnerabilityDetail(path string, outputPath string) (*mod
 	}
 
 	// 设置URL (由于HTML内容中不含完整URL)
+	// 修复URL重复问题，避免前缀重复
 	if result.URL == "" {
-		result.URL = c.client.GetBaseURL() + path
+		// 清理可能存在的重复WLB-前缀
+		cleanPath := path
+		if strings.Contains(path, "/issue/WLB-WLB-") {
+			cleanPath = strings.Replace(path, "/issue/WLB-WLB-", "/issue/WLB-", 1)
+			// 添加调试信息
+			fmt.Printf("DEBUG: 发现URL前缀重复，清理后路径: %s\n", cleanPath)
+		}
+		result.URL = c.client.GetBaseURL() + cleanPath
+		// 添加调试信息
+		fmt.Printf("DEBUG: 设置URL: %s\n", result.URL)
 	}
 
 	// 保存结果
@@ -141,8 +154,16 @@ func (c *Crawler) CrawlExploit(id string, outputPath string, fields string) erro
 		// 默认爬取漏洞列表页面
 		path = "/exploit/1"
 	} else {
-		// 爬取指定ID的漏洞详情页面
-		path = "/issue/WLB-" + id
+		// 检查ID是否已包含WLB-前缀
+		if strings.HasPrefix(id, "WLB-") {
+			path = "/issue/" + id
+			// 添加调试信息
+			fmt.Printf("DEBUG: ID已包含WLB-前缀，构建路径: %s\n", path)
+		} else {
+			path = "/issue/WLB-" + id
+			// 添加调试信息
+			fmt.Printf("DEBUG: ID不包含WLB-前缀，构建路径: %s\n", path)
+		}
 	}
 
 	if strings.Contains(path, "/issue/WLB-") {
