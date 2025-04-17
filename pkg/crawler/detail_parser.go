@@ -2,6 +2,7 @@ package crawler
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
@@ -21,7 +22,9 @@ func (p *Parser) ParseVulnerabilityDetailPage(htmlContent string) (*model.Vulner
 		return nil, fmt.Errorf("failed to parse HTML: %w", err)
 	}
 
-	vulnerability := &model.Vulnerability{}
+	vulnerability := &model.Vulnerability{
+		Tags: []string{}, // 初始化为空切片，用于存储其他标签
+	}
 
 	// 提取标题 - 更精确的选择器
 	vulnerability.Title = strings.TrimSpace(doc.Find("h4 > B").First().Text())
@@ -35,42 +38,48 @@ func (p *Parser) ParseVulnerabilityDetailPage(htmlContent string) (*model.Vulner
 	riskLevelLabel := doc.Find(".well-sm:contains('Risk:')").Find("span.label")
 	vulnerability.RiskLevel = strings.TrimSpace(riskLevelLabel.Text())
 
-	// 提取标签 - 逐个精确查找
-	vulnerability.Tags = []string{} // 初始化为空切片
+	// 正则表达式用于提取CVE和CWE编号
+	cvePattern := regexp.MustCompile(`CVE-\d{4}-\d+`)
+	cwePattern := regexp.MustCompile(`CWE-\d+`)
 
-	// CVE
+	// 提取CVE编号
 	cveLink := doc.Find(".well-sm:contains('CVE:')").Find("a[href*='cveshow']")
 	cveText := strings.TrimSpace(cveLink.Text())
 	if cveText != "" {
-		vulnerability.Tags = append(vulnerability.Tags, cveText)
+		// 使用正则表达式匹配CVE编号
+		if matches := cvePattern.FindStringSubmatch(cveText); len(matches) > 0 {
+			vulnerability.CVE = matches[0]
+		} else {
+			vulnerability.CVE = cveText // 如果无法匹配模式，保留原始文本
+		}
 	}
 
-	// CWE
+	// 提取CWE编号
 	cweLink := doc.Find(".well-sm:contains('CWE:')").Find("a[href*='cwe']")
 	cweText := strings.TrimSpace(cweLink.Text())
 	if cweText != "" {
-		vulnerability.Tags = append(vulnerability.Tags, cweText)
+		// 使用正则表达式匹配CWE编号
+		if matches := cwePattern.FindStringSubmatch(cweText); len(matches) > 0 {
+			vulnerability.CWE = matches[0]
+		} else {
+			vulnerability.CWE = cweText // 如果无法匹配模式，保留原始文本
+		}
 	}
 
-	// Local - HTML: <U>Local:</U> <b><B>Yes</B></span></b> or similar
+	// 提取Local状态 - 设置bool字段
 	doc.Find(".well-sm:contains('Local:')").Each(func(_ int, s *goquery.Selection) {
-		// 查找此 well 内部的 <b> 或 <B> 标签，并检查文本
 		s.Find("b, B").Each(func(_ int, b *goquery.Selection) {
 			if strings.TrimSpace(b.Text()) == "Yes" {
-				// 只有当找到文本为 Yes 的 b 标签时才添加
-				vulnerability.Tags = append(vulnerability.Tags, "Local")
-				return // 假设每个 well 最多一个 Yes
+				vulnerability.IsLocal = true
 			}
 		})
 	})
 
-	// Remote - HTML: <U>Remote:</U> <b>No</b> or similar
+	// 提取Remote状态 - 设置bool字段
 	doc.Find(".well-sm:contains('Remote:')").Each(func(_ int, s *goquery.Selection) {
-		// 查找此 well 内部的 <b> 或 <B> 标签，并检查文本
 		s.Find("b, B").Each(func(_ int, b *goquery.Selection) {
 			if strings.TrimSpace(b.Text()) == "Yes" {
-				vulnerability.Tags = append(vulnerability.Tags, "Remote")
-				return
+				vulnerability.IsRemote = true
 			}
 		})
 	})
@@ -109,6 +118,26 @@ func (p *Parser) ParseVulnerabilityDetailPage(htmlContent string) (*model.Vulner
 			// vulnerability.AuthorURL = "/" + vulnerability.AuthorURL // 示例
 		}
 	}
+
+	// 提取其他标签 - 例如漏洞类型、平台等
+	doc.Find(".well-sm").Each(func(_ int, s *goquery.Selection) {
+		// 跳过已处理的字段
+		wellText := s.Text()
+		if strings.Contains(wellText, "CVE:") ||
+			strings.Contains(wellText, "CWE:") ||
+			strings.Contains(wellText, "Local:") ||
+			strings.Contains(wellText, "Remote:") ||
+			strings.Contains(wellText, "Risk:") ||
+			strings.Contains(wellText, "Credit:") {
+			return
+		}
+
+		// 寻找可能的标签值
+		labelText := strings.TrimSpace(s.Find("label, span.label").Text())
+		if labelText != "" && labelText != "N/A" && !strings.Contains(labelText, ":") {
+			vulnerability.Tags = append(vulnerability.Tags, labelText)
+		}
+	})
 
 	// --- 去重 Tags ---
 	if len(vulnerability.Tags) > 0 {

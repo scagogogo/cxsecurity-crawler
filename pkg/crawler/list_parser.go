@@ -29,6 +29,10 @@ func (p *Parser) ParseListPage(htmlContent string) (*model.VulnerabilityList, er
 
 	var currentDate time.Time // 用于存储最近解析到的日期
 
+	// 编译正则表达式用于匹配CVE和CWE
+	cvePattern := regexp.MustCompile(`CVE-\d{4}-\d+`)
+	cwePattern := regexp.MustCompile(`CWE-\d+`)
+
 	// 查找表格
 	table := doc.Find("table.table-striped")
 
@@ -72,41 +76,68 @@ func (p *Parser) ParseListPage(htmlContent string) (*model.VulnerabilityList, er
 			}
 		}
 
+		// 初始化漏洞对象，设置基本信息
+		vulnerability := model.Vulnerability{
+			Date:      currentDate,
+			Title:     title,
+			URL:       url,
+			RiskLevel: riskLevel,
+			Tags:      []string{}, // 用于保存其他标签
+			Author:    "",         // 默认为空，后面会设置
+			AuthorURL: "",         // 默认为空，后面会设置
+		}
+
 		// 标签 (第二列，右侧)
-		var tags []string
 		cells.Eq(1).Find("div.row div.col-md-5 span.label").Each(func(j int, tagSelection *goquery.Selection) {
+			// 跳过作者标签
 			if tagSelection.Find("a[href*='/author/']").Length() == 0 {
 				tag := strings.TrimSpace(tagSelection.Text())
-				if tag != "" {
-					tags = append(tags, tag)
+				if tag == "" {
+					return
 				}
+
+				// 检查是否是CVE编号
+				if cveMatches := cvePattern.FindStringSubmatch(tag); len(cveMatches) > 0 {
+					vulnerability.CVE = cveMatches[0]
+					return
+				}
+
+				// 检查是否是CWE编号
+				if cweMatches := cwePattern.FindStringSubmatch(tag); len(cweMatches) > 0 {
+					vulnerability.CWE = cweMatches[0]
+					return
+				}
+
+				// 检查是否是Remote/Local标记
+				if tag == "Remote" {
+					vulnerability.IsRemote = true
+					return
+				}
+				if tag == "Local" {
+					vulnerability.IsLocal = true
+					return
+				}
+
+				// 添加到其他标签列表
+				vulnerability.Tags = append(vulnerability.Tags, tag)
 			}
 		})
 
 		// 作者信息 (第二列，右侧的作者链接)
 		authorSelection := cells.Eq(1).Find("div.row div.col-md-5 a[href*='/author/']")
-		author := strings.TrimSpace(authorSelection.Text())
-		authorURL, _ := authorSelection.Attr("href")
+		vulnerability.Author = strings.TrimSpace(authorSelection.Text())
+		vulnerability.AuthorURL, _ = authorSelection.Attr("href")
 		// 修正作者URL
-		if authorURL != "" && !strings.HasPrefix(authorURL, "http") {
-			if strings.HasPrefix(authorURL, "/") {
-				authorURL = "https://cxsecurity.com" + authorURL
+		if vulnerability.AuthorURL != "" && !strings.HasPrefix(vulnerability.AuthorURL, "http") {
+			if strings.HasPrefix(vulnerability.AuthorURL, "/") {
+				vulnerability.AuthorURL = "https://cxsecurity.com" + vulnerability.AuthorURL
 			} else {
-				authorURL = "https://cxsecurity.com/" + authorURL
+				vulnerability.AuthorURL = "https://cxsecurity.com/" + vulnerability.AuthorURL
 			}
 		}
 
-		// 创建漏洞对象 - 只要标题不为空就创建，使用最近解析到的日期
-		if title != "" {
-			vulnerability := model.Vulnerability{
-				Date:      currentDate, // 使用最近解析到的日期，如果从未解析到则为零值
-				Title:     title,
-				URL:       url,
-				RiskLevel: riskLevel,
-				Tags:      tags,
-				Author:    author,
-				AuthorURL: authorURL,
-			}
+		// 只有标题不为空才添加该漏洞
+		if vulnerability.Title != "" {
 			result.Items = append(result.Items, vulnerability)
 		}
 	})

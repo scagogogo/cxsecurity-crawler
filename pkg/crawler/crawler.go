@@ -140,8 +140,9 @@ func (c *Crawler) CrawlCveDetail(cveID string, outputPath string) (*model.CveDet
 	return result, nil
 }
 
-// CrawlExploit 爬取漏洞列表或指定ID的漏洞，返回对应的结果
+// CrawlExploit 爬取漏洞列表或漏洞详情
 func (c *Crawler) CrawlExploit(id string, outputPath string, fields string) (interface{}, error) {
+	// 确定路径
 	var path string
 	if id == "" {
 		// 默认爬取漏洞列表页面
@@ -181,7 +182,13 @@ func (c *Crawler) CrawlExploit(id string, outputPath string, fields string) (int
 		for i := range result.Items {
 			if result.Items[i].URL != "" {
 				if idx := strings.Index(result.Items[i].URL, "WLB-"); idx != -1 {
-					result.Items[i].ID = result.Items[i].URL[idx:]
+					// 提取URL中的ID
+					urlPart := result.Items[i].URL[idx:]
+					endIdx := len(urlPart)
+					if slashIdx := strings.IndexByte(urlPart, '/'); slashIdx != -1 {
+						endIdx = slashIdx
+					}
+					result.Items[i].ID = urlPart[:endIdx]
 				}
 			}
 		}
