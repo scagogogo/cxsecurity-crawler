@@ -190,14 +190,6 @@ func (c *Crawler) CrawlExploit(id string, outputPath string, fields string) (int
 	}
 }
 
-// 辅助函数：返回两个整数中的较大值
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
 // saveResult 将爬取结果保存到文件中
 func (c *Crawler) saveResult(result *model.VulnerabilityList, outputPath string) error {
 	// 创建目录
