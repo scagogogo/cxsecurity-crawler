@@ -49,6 +49,14 @@ var searchCmd = &cobra.Command{
 			}
 		}
 
+		// 显示搜索开始提示
+		if !searchSilent {
+			fmt.Printf("\n%s %s %s\n\n",
+				text.Colors{text.FgHiBlue, text.Bold}.Sprint("🔍 正在搜索:"),
+				text.Colors{text.FgHiWhite, text.Bold}.Sprint(searchKeyword),
+				text.Colors{text.FgHiBlack}.Sprintf("(排序: %s, 每页: %d)", sortOrder, searchPerPage))
+		}
+
 		// 循环查询多页结果
 		currentPage := searchPage
 		for {
@@ -60,20 +68,31 @@ var searchCmd = &cobra.Command{
 				outputPath = fmt.Sprintf("%s_page%d%s", base, currentPage, ext)
 			}
 
+			// 显示加载提示
+			if !searchSilent {
+				fmt.Printf("%s 第 %d 页...\r",
+					text.Colors{text.FgHiCyan}.Sprint("⏳ 加载中:"),
+					currentPage)
+			}
+
 			result, err := c.SearchVulnerabilitiesAdvanced(searchKeyword, currentPage, searchPerPage, sortOrder, outputPath)
 			if err != nil {
-				fmt.Printf("搜索失败: %v\n", err)
+				fmt.Printf("\n%s %v\n",
+					text.Colors{text.FgRed, text.Bold}.Sprint("❌ 搜索失败:"),
+					err)
 				return
 			}
 
 			// 只有在非静默模式下才输出结果
 			if !searchSilent {
+				// 清除加载提示
+				fmt.Print("\r                                  \r")
 				printSearchResult(result, outputPath)
 			}
 
 			// 如果启用了分页并且还有更多页，询问用户是否继续
 			if !searchNoPaging && currentPage < result.TotalPages {
-				if !askForNextPage() {
+				if !askForNextPage(currentPage, result.TotalPages) {
 					break
 				}
 				currentPage++
@@ -85,9 +104,11 @@ var searchCmd = &cobra.Command{
 }
 
 // askForNextPage 询问用户是否继续查看下一页
-func askForNextPage() bool {
+func askForNextPage(currentPage, totalPages int) bool {
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("是否查看下一页？(y/n): ")
+	fmt.Printf("\n%s %s (y/n): ",
+		text.Colors{text.FgHiYellow}.Sprint("📄"),
+		text.Colors{text.FgHiWhite}.Sprintf("当前第 %d/%d 页，是否查看下一页？", currentPage, totalPages))
 	text, _ := reader.ReadString('\n')
 	text = strings.TrimSpace(strings.ToLower(text))
 	return text == "y" || text == "yes"
@@ -192,17 +213,34 @@ func printSearchResult(result *crawler.SearchResult, outputPath string) {
 		fmt.Sprintf("页码: %d/%d", result.CurrentPage, result.TotalPages),
 		""})
 
-	// 渲染表格
-	fmt.Printf("\n搜索关键词: %s\n", text.Colors{text.Bold, text.FgHiGreen}.Sprint(result.Keyword))
-	fmt.Printf("排序方式: %s | 每页记录数: %d\n",
-		result.SortOrder,
-		result.PerPage)
-	t.Render()
-	fmt.Println()
+	// 渲染表格标题
+	fmt.Printf("\n%s %s\n",
+		text.Colors{text.Bold, text.FgHiGreen}.Sprint("🔎 搜索结果:"),
+		text.Colors{text.Bold, text.FgHiWhite}.Sprint(result.Keyword))
 
+	fmt.Printf("%s %s | %s %d\n",
+		text.Colors{text.FgHiBlack}.Sprint("⬆️ 排序:"),
+		getSortOrderText(result.SortOrder),
+		text.Colors{text.FgHiBlack}.Sprint("📊 每页:"),
+		result.PerPage)
+
+	// 渲染表格
+	t.Render()
+
+	// 显示保存信息
 	if outputPath != "" {
-		fmt.Printf("结果已保存到 %s\n", outputPath)
+		fmt.Printf("\n%s %s\n",
+			text.Colors{text.FgHiGreen}.Sprint("✅ 已保存:"),
+			text.Colors{text.FgHiCyan, text.Underline}.Sprint(outputPath))
 	}
+}
+
+// getSortOrderText 返回排序顺序的友好文本
+func getSortOrderText(sortOrder string) string {
+	if sortOrder == "DESC" {
+		return "最新优先"
+	}
+	return "最早优先"
 }
 
 func init() {
