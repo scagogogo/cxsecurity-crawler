@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/scagogogo/cxsecurity-crawler/pkg/model"
 )
 
@@ -208,16 +209,17 @@ func (c *Crawler) CrawlAuthor(authorID string, outputPath string) (*model.Author
 		return nil, fmt.Errorf("获取作者页面内容失败: %w", err)
 	}
 
-	// 解析页面内容
-	authorParser := NewAuthorParser()
-	resultInterface, err := authorParser.Parse(htmlContent)
+	// 解析HTML内容为Document
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlContent))
 	if err != nil {
-		return nil, fmt.Errorf("解析作者页面内容失败: %w", err)
+		return nil, fmt.Errorf("解析HTML内容失败: %w", err)
 	}
 
-	result, ok := resultInterface.(*model.AuthorProfile)
-	if !ok {
-		return nil, fmt.Errorf("解析结果类型错误")
+	// 解析页面内容
+	authorParser := NewAuthorParser()
+	result, err := authorParser.Parse(doc)
+	if err != nil {
+		return nil, fmt.Errorf("解析作者页面内容失败: %w", err)
 	}
 
 	// 如果未成功解析到ID，使用输入的作者ID
