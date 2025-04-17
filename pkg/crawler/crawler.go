@@ -204,32 +204,32 @@ func (c *Crawler) CrawlExploit(id string, outputPath string, fields string) erro
 
 		// 动态计算各列宽度
 		// 终端宽度减去表格边框和列分隔符所占用的空间（大约是每列2个字符和表边框4个字符）
-		availableWidth := width - (4 + 2*5) // 改回5列
+		availableWidth := width - (4 + 2*5) // 5列: 日期、风险、ID、标题、作者
 
 		// 根据内容特点分配各列宽度占比
 		dateRatio := 0.10   // 日期列 - 约10%
 		riskRatio := 0.08   // 风险列 - 约8%
+		idRatio := 0.15     // ID列 - 约15%
 		titleRatio := 0.47  // 标题列 - 约47%
-		tagsRatio := 0.15   // 标签列 - 约15%
 		authorRatio := 0.20 // 作者列 - 约20%
 
 		// 计算各列实际宽度（最小保证有10个字符）
 		dateWidth := max(12, int(float64(availableWidth)*dateRatio))
 		riskWidth := max(8, int(float64(availableWidth)*riskRatio))
+		idWidth := max(15, int(float64(availableWidth)*idRatio))
 		titleWidth := max(25, int(float64(availableWidth)*titleRatio))
-		tagsWidth := max(15, int(float64(availableWidth)*tagsRatio))
 		authorWidth := max(15, int(float64(availableWidth)*authorRatio))
 
 		// 设置表头
-		t.AppendHeader(table.Row{"日期", "风险", "ID 和标题", "标签", "作者"})
+		t.AppendHeader(table.Row{"日期", "风险", "ID", "标题", "作者"})
 
-		// 设置表头颜色和样式
+		// 设置表头颜色和样式 - 使用更通用的颜色，避免深色/浅色系问题
 		t.SetColumnConfigs([]table.ColumnConfig{
-			{Number: 1, Align: text.AlignCenter, AlignHeader: text.AlignCenter, Colors: text.Colors{}, ColorsHeader: text.Colors{text.BgHiBlack, text.FgHiWhite, text.Bold}, WidthMax: dateWidth},
-			{Number: 2, Align: text.AlignCenter, AlignHeader: text.AlignCenter, Colors: text.Colors{text.FgHiYellow}, ColorsHeader: text.Colors{text.BgHiBlack, text.FgHiWhite, text.Bold}, WidthMax: riskWidth},
-			{Number: 3, AlignHeader: text.AlignCenter, Colors: text.Colors{text.FgHiWhite}, ColorsHeader: text.Colors{text.BgHiBlack, text.FgHiWhite, text.Bold}, WidthMax: titleWidth},
-			{Number: 4, Align: text.AlignCenter, AlignHeader: text.AlignCenter, Colors: text.Colors{text.FgHiGreen}, ColorsHeader: text.Colors{text.BgHiBlack, text.FgHiWhite, text.Bold}, WidthMax: tagsWidth},
-			{Number: 5, AlignHeader: text.AlignCenter, Colors: text.Colors{text.FgHiMagenta}, ColorsHeader: text.Colors{text.BgHiBlack, text.FgHiWhite, text.Bold}, WidthMax: authorWidth},
+			{Number: 1, Align: text.AlignCenter, AlignHeader: text.AlignCenter, ColorsHeader: text.Colors{text.Bold}, WidthMax: dateWidth},
+			{Number: 2, Align: text.AlignCenter, AlignHeader: text.AlignCenter, Colors: text.Colors{text.FgHiYellow}, ColorsHeader: text.Colors{text.Bold}, WidthMax: riskWidth},
+			{Number: 3, Align: text.AlignCenter, AlignHeader: text.AlignCenter, Colors: text.Colors{text.FgHiCyan}, ColorsHeader: text.Colors{text.Bold}, WidthMax: idWidth},
+			{Number: 4, AlignHeader: text.AlignCenter, Colors: text.Colors{text.FgHiWhite}, ColorsHeader: text.Colors{text.Bold}, WidthMax: titleWidth},
+			{Number: 5, AlignHeader: text.AlignCenter, Colors: text.Colors{text.FgHiMagenta}, ColorsHeader: text.Colors{text.Bold}, WidthMax: authorWidth},
 		})
 
 		// 添加数据行
@@ -252,33 +252,15 @@ func (c *Crawler) CrawlExploit(id string, outputPath string, fields string) erro
 
 			// 标题可能很长，需要截断
 			title := item.Title
-			// 组合ID和标题
-			idAndTitle := fmt.Sprintf("%s\n%s", text.Colors{text.FgHiCyan}.Sprint(vulnID), title)
-			if len(idAndTitle) > titleWidth-3 {
-				// 截断标题部分，保留ID
-				maxTitleLen := titleWidth - len(vulnID) - 6 // 为省略号留出空间
+			if len(title) > titleWidth-3 {
+				// 截断标题部分
+				maxTitleLen := titleWidth - 6 // 为省略号留出空间
 				if maxTitleLen > 0 {
 					// 添加安全检查，确保不会超出字符串边界
 					if maxTitleLen <= len(title) {
 						title = title[:maxTitleLen] + "..."
 					}
-					idAndTitle = fmt.Sprintf("%s\n%s", text.Colors{text.FgHiCyan}.Sprint(vulnID), title)
 				}
-			}
-
-			// 标签格式化
-			tags := "无"
-			if len(item.Tags) > 0 {
-				tagsStr := strings.Join(item.Tags, ", ")
-				if len(tagsStr) > tagsWidth-3 {
-					// 增加安全检查
-					endPos := tagsWidth - 6
-					if endPos > len(tagsStr) {
-						endPos = len(tagsStr)
-					}
-					tagsStr = tagsStr[:endPos] + "..."
-				}
-				tags = tagsStr
 			}
 
 			// 作者名可能很长，需要截断
@@ -299,13 +281,13 @@ func (c *Crawler) CrawlExploit(id string, outputPath string, fields string) erro
 			// 添加数据行，根据风险等级着色
 			switch strings.ToLower(riskLevel) {
 			case "high":
-				riskRow = table.Row{date, text.Colors{text.FgRed, text.Bold}.Sprint(riskLevel), idAndTitle, tags, author}
+				riskRow = table.Row{date, text.Colors{text.FgRed, text.Bold}.Sprint(riskLevel), vulnID, title, author}
 			case "med.", "medium":
-				riskRow = table.Row{date, text.Colors{text.FgYellow, text.Bold}.Sprint(riskLevel), idAndTitle, tags, author}
+				riskRow = table.Row{date, text.Colors{text.FgYellow, text.Bold}.Sprint(riskLevel), vulnID, title, author}
 			case "low":
-				riskRow = table.Row{date, text.Colors{text.FgGreen, text.Bold}.Sprint(riskLevel), idAndTitle, tags, author}
+				riskRow = table.Row{date, text.Colors{text.FgGreen, text.Bold}.Sprint(riskLevel), vulnID, title, author}
 			default:
-				riskRow = table.Row{date, riskLevel, idAndTitle, tags, author}
+				riskRow = table.Row{date, riskLevel, vulnID, title, author}
 			}
 			t.AppendRow(riskRow)
 		}
