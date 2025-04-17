@@ -214,11 +214,11 @@ func (c *Crawler) CrawlExploit(id string, outputPath string, fields string) erro
 
 		// 设置表头颜色和样式
 		t.SetColumnConfigs([]table.ColumnConfig{
-			{Number: 1, Align: text.AlignCenter, AlignHeader: text.AlignCenter, Colors: text.Colors{text.FgHiCyan, text.Bold}, WidthMax: dateWidth},
-			{Number: 2, Align: text.AlignCenter, AlignHeader: text.AlignCenter, Colors: text.Colors{text.FgHiYellow}, WidthMax: riskWidth},
-			{Number: 3, AlignHeader: text.AlignCenter, Colors: text.Colors{text.FgHiWhite}, WidthMax: titleWidth},
-			{Number: 4, Align: text.AlignCenter, AlignHeader: text.AlignCenter, Colors: text.Colors{text.FgHiGreen}, WidthMax: tagsWidth},
-			{Number: 5, AlignHeader: text.AlignCenter, Colors: text.Colors{text.FgHiMagenta}, WidthMax: authorWidth},
+			{Number: 1, Align: text.AlignCenter, AlignHeader: text.AlignCenter, Colors: text.Colors{}, ColorsHeader: text.Colors{text.BgHiBlack, text.FgHiWhite, text.Bold}, WidthMax: dateWidth},
+			{Number: 2, Align: text.AlignCenter, AlignHeader: text.AlignCenter, Colors: text.Colors{text.FgHiYellow}, ColorsHeader: text.Colors{text.BgHiBlack, text.FgHiWhite, text.Bold}, WidthMax: riskWidth},
+			{Number: 3, AlignHeader: text.AlignCenter, Colors: text.Colors{text.FgHiWhite}, ColorsHeader: text.Colors{text.BgHiBlack, text.FgHiWhite, text.Bold}, WidthMax: titleWidth},
+			{Number: 4, Align: text.AlignCenter, AlignHeader: text.AlignCenter, Colors: text.Colors{text.FgHiGreen}, ColorsHeader: text.Colors{text.BgHiBlack, text.FgHiWhite, text.Bold}, WidthMax: tagsWidth},
+			{Number: 5, AlignHeader: text.AlignCenter, Colors: text.Colors{text.FgHiMagenta}, ColorsHeader: text.Colors{text.BgHiBlack, text.FgHiWhite, text.Bold}, WidthMax: authorWidth},
 		})
 
 		// 添加数据行
@@ -258,13 +258,13 @@ func (c *Crawler) CrawlExploit(id string, outputPath string, fields string) erro
 			// 添加数据行，根据风险等级着色
 			switch strings.ToLower(riskLevel) {
 			case "high":
-				riskRow = table.Row{date, text.Colors{text.FgRed, text.Bold}.Sprint(riskLevel), title, tags, author}
+				riskRow = table.Row{date, text.Colors{text.FgRed, text.Bold}.Sprint(riskLevel), text.Colors{text.FgWhite, text.Bold}.Sprint(title), tags, author}
 			case "med.", "medium":
-				riskRow = table.Row{date, text.Colors{text.FgYellow, text.Bold}.Sprint(riskLevel), title, tags, author}
+				riskRow = table.Row{date, text.Colors{text.FgYellow, text.Bold}.Sprint(riskLevel), text.Colors{text.FgWhite}.Sprint(title), tags, author}
 			case "low":
-				riskRow = table.Row{date, text.Colors{text.FgGreen, text.Bold}.Sprint(riskLevel), title, tags, author}
+				riskRow = table.Row{date, text.Colors{text.FgGreen, text.Bold}.Sprint(riskLevel), text.Colors{text.FgWhite}.Sprint(title), tags, author}
 			default:
-				riskRow = table.Row{date, riskLevel, title, tags, author}
+				riskRow = table.Row{date, riskLevel, text.Colors{text.FgWhite}.Sprint(title), tags, author}
 			}
 			t.AppendRow(riskRow)
 		}
