@@ -2,6 +2,8 @@
 /crawler
 /cve_crawler
 /cve_test
+/cxsecurity
+/cxsecurity-crawler
 *.exe
 *.exe~
 *.dll
