@@ -83,6 +83,28 @@ go build -o cxsecurity
 ./cxsecurity author -i "m4xth0r" -o "author_result.json" -s
 ```
 
+#### 搜索漏洞信息
+
+```bash
+# 基本用法（搜索关键词"CVE-2024"）
+./cxsecurity search -k "CVE-2024"
+
+# 指定排序顺序（ASC升序或DESC降序）和每页记录数（10或30）
+./cxsecurity search -k "sql injection" -s "ASC" -n 30
+
+# 指定页码，从第2页开始搜索
+./cxsecurity search -k "RCE" -p 2
+
+# 指定输出文件
+./cxsecurity search -k "XSS" -o "xss_search_result.json"
+
+# 禁用交互式分页（默认会在每页结束后询问是否继续）
+./cxsecurity search -k "buffer overflow" --no-paging
+
+# 使用静默模式
+./cxsecurity search -k "privilege escalation" -s
+```
+
 ### 漏洞列表爬虫命令行参数
 
 - `-i, --id`: 要爬取的漏洞ID，例如 `WLB-2024040035` 或简写为 `2024040035`（不指定时爬取漏洞列表，指定时爬取漏洞详情）
@@ -127,6 +149,16 @@ go build -o cxsecurity
 - `-i, --id`: 要爬取的作者ID，例如 `m4xth0r`（必须参数）
 - `-o, --output`: 结果输出的文件路径，默认为 `author_result.json`
 - `-s, --silent`: 静默模式，不输出到标准输出，适用于API调用
+
+### 搜索功能命令行参数
+
+- `-k, --keyword`: 搜索关键词，例如 `CVE-2024` 或 `sql injection`（必须参数）
+- `-p, --page`: 开始搜索的页码，默认为 `1`
+- `-n, --perpage`: 每页记录数，可选值为 `10` 或 `30`，默认为 `10`
+- `-s, --sort`: 排序顺序，可选值为 `ASC`（升序）或 `DESC`（降序），默认为 `DESC`
+- `-o, --output`: 结果输出的文件路径，默认为 `search_result.json`
+- `--silent`: 静默模式，不输出到标准输出，适用于API调用
+- `--no-paging`: 禁用交互式分页，只显示指定页面的结果，默认启用分页
 
 ## API 文档
 
@@ -235,6 +267,47 @@ fmt.Printf("CVSS基础评分: %.1f\n", cveDetail.CvssBaseScore)
 // 输出受影响的软件
 for _, software := range cveDetail.AffectedSoftware {
     fmt.Printf("受影响的软件: %s %s\n", software.VendorName, software.ProductName)
+}
+```
+
+### 搜索漏洞
+
+```go
+import (
+    "github.com/scagogogo/cxsecurity-crawler/pkg/crawler"
+    "fmt"
+)
+
+// 创建爬虫实例
+c := crawler.NewCrawler()
+
+// 基本搜索（使用默认参数：第1页，每页10条，降序排序）
+result, err := c.SearchVulnerabilities("CVE-2024", 1, "search_result.json")
+if err != nil {
+    fmt.Printf("搜索失败: %v\n", err)
+    return
+}
+
+// 使用高级搜索功能（指定页码、每页数量和排序顺序）
+result, err = c.SearchVulnerabilitiesAdvanced("sql injection", 2, 30, "ASC", "search_result.json")
+if err != nil {
+    fmt.Printf("搜索失败: %v\n", err)
+    return
+}
+
+// 使用搜索结果
+fmt.Printf("关键词: %s\n", result.Keyword)
+fmt.Printf("当前页/总页数: %d/%d\n", result.CurrentPage, result.TotalPages)
+fmt.Printf("找到 %d 条结果\n", len(result.Vulnerabilities))
+
+// 输出搜索结果
+for _, vuln := range result.Vulnerabilities {
+    fmt.Printf("ID: %s\n", vuln.ID)
+    fmt.Printf("标题: %s\n", vuln.Title)
+    fmt.Printf("日期: %s\n", vuln.Date)
+    fmt.Printf("风险级别: %s\n", vuln.RiskLevel)
+    fmt.Printf("作者: %s\n", vuln.Author)
+    fmt.Println("-------------------")
 }
 ```
 
@@ -358,6 +431,29 @@ type AffectedSoftware struct {
 }
 ```
 
+#### 搜索结果模型
+
+```go
+type SearchResult struct {
+    Keyword         string                // 搜索关键词
+    CurrentPage     int                   // 当前页码
+    TotalPages      int                   // 总页数
+    SortOrder       string                // 排序顺序(ASC或DESC)
+    PerPage         int                   // 每页记录数
+    Vulnerabilities []SearchVulnerability // 漏洞列表
+}
+
+type SearchVulnerability struct {
+    ID        string // 漏洞ID
+    Title     string // 标题
+    URL       string // URL
+    Date      string // 日期
+    RiskLevel string // 风险级别
+    Author    string // 作者
+    AuthorURL string // 作者URL
+}
+```
+
 ## 数据格式示例
 
 ### 漏洞列表输出格式
@@ -430,6 +526,40 @@ type AffectedSoftware struct {
       "url": "https://cxsecurity.com/issue/WLB-2007030105",
       "risk_level": "High",
       "author": "rgod"
+    }
+  ]
+}
+```
+
+### 搜索结果输出格式
+
+程序将搜索结果数据保存为 JSON 格式，结构如下：
+
+```json
+{
+  "Keyword": "sql injection",
+  "CurrentPage": 1,
+  "TotalPages": 10,
+  "SortOrder": "DESC",
+  "PerPage": 10,
+  "Vulnerabilities": [
+    {
+      "ID": "WLB-2025040023",
+      "Title": "Gnuboard5 5.3.2.8 SQL Injection",
+      "URL": "https://cxsecurity.com/issue/WLB-2025040023",
+      "Date": "2025-04-15",
+      "RiskLevel": "Med.",
+      "Author": "CodeSecLab",
+      "AuthorURL": "https://cxsecurity.com/author/CodeSecLab/1/"
+    },
+    {
+      "ID": "WLB-2025040019",
+      "Title": "Feng Office 3.11.1.2 SQL Injection",
+      "URL": "https://cxsecurity.com/issue/WLB-2025040019",
+      "Date": "2025-04-10",
+      "RiskLevel": "Med.",
+      "Author": "Andrey Stoykov",
+      "AuthorURL": "https://cxsecurity.com/author/Andrey%20Stoykov/1/"
     }
   ]
 }
