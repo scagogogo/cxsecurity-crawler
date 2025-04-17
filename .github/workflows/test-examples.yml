@@ -1,0 +1,97 @@
+name: Test Examples
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'examples/**'
+      - '.github/workflows/test-examples.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'examples/**'
+      - '.github/workflows/test-examples.yml'
+
+jobs:
+  test-examples:
+    runs-on: ubuntu-latest
+
+    services:
+      # 启动API服务器作为测试环境
+      api-server:
+        image: golang:1.21
+        ports:
+          - 8080:8080
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          cache: true
+      
+      # 启动API服务器
+      - name: Start API Server
+        run: |
+          go build -o cxsecurity ./main.go
+          ./cxsecurity api &
+          # 等待服务器启动
+          sleep 5
+        env:
+          API_TOKEN: test-token-123
+
+      # 测试基础搜索示例
+      - name: Test Basic Search Example
+        run: |
+          cd examples/01-basic-search
+          sed -i 's/your-api-token-here/test-token-123/g' main.go
+          go run main.go
+        env:
+          API_TOKEN: test-token-123
+
+      # 测试分页搜索示例
+      - name: Test Pagination Example
+        run: |
+          cd examples/02-pagination
+          sed -i 's/your-api-token-here/test-token-123/g' main.go
+          go run main.go
+        env:
+          API_TOKEN: test-token-123
+
+      # 测试高级搜索示例
+      - name: Test Advanced Search Example
+        run: |
+          cd examples/03-advanced-search
+          sed -i 's/your-api-token-here/test-token-123/g' main.go
+          go run main.go
+        env:
+          API_TOKEN: test-token-123
+
+      # 测试漏洞详情示例
+      - name: Test Vulnerability Detail Example
+        run: |
+          cd examples/04-vulnerability-detail
+          sed -i 's/your-api-token-here/test-token-123/g' main.go
+          go run main.go
+        env:
+          API_TOKEN: test-token-123
+
+      # 测试CVE详情示例
+      - name: Test CVE Detail Example
+        run: |
+          cd examples/05-cve-detail
+          sed -i 's/your-api-token-here/test-token-123/g' main.go
+          go run main.go
+        env:
+          API_TOKEN: test-token-123
+
+      # 测试作者信息示例
+      - name: Test Author Info Example
+        run: |
+          cd examples/06-author-info
+          sed -i 's/your-api-token-here/test-token-123/g' main.go
+          go run main.go
+        env:
+          API_TOKEN: test-token-123 
