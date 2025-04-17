@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<HTML lang="en">
+    <HEAD>
+        <META http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <TITLE>Search - CXSECURITY.COM</TITLE>
+        <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+        <META name="keywords" content="search, exploit, find, metasploit, cve, sploit, find, testing, fuzzing, CWE, Common Weakness Enumeration, research, dorks, details, hack, anonymous, bugtraq">
+        <META name="description" content="World Laboratory of Bugtraq Search (WLB2) is a huge collection of information on data communications safety. Its main objective is to inform about errors in various applications. ">
+        <META name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <META name="mobile-web-app-capable" content="yes">
+        <link rel="manifest" href="/manifest.json?b">
+        <LINK rel="Icon" href="https://cert.cx/cxstatic/favicon.ico" type="image/x-icon">
+        <script type="text/javascript" src="https://cert.cx/cxstatic/js/m-jq.js?T"></script>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+        <script type="text/javascript" src="https://cert.cx/cxstatic/js/m.js?V"></script>
+        <script src='https://cert.cx/cxstatic/js/searchm.js?Y'></script>
+        <link href="https://cert.cx/cxstatic/css/b.css?G" rel="stylesheet" type='text/css'/>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-VGFSMZ5JB0"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+
+            gtag('config', 'G-VGFSMZ5JB0');
+        </script>
+    </HEAD>
+    <!-- <script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-39628967-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+ga.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'stats.g.doubleclick.net/dc.js';
+var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>-->
+    <BODY ng-app="ui.bootstrap.demo">
+        <div class="navbar navbar-default navbar-fixed-top" id="frezz">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="https://cxsecurity.com/">
+                        <IMG SRC="https://cert.cx/cxstatic/images/12018/cxseci.png" width="150" height="20" ALT="Home Page">
+                    </a>
+                    <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="navbar-collapse collapse" id="navbar-main">
+                    <ul class="nav navbar-nav">
+                        <li>
+                            <a href="https://cxsecurity.com/">Home</a>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                Bugtraq<span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li>
+                                    <a href="https://cxsecurity.com/wlb/">Full List</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="https://cxsecurity.com/bugs/">Only Bugs</a>
+                                </li>
+                                <li>
+                                    <a href="https://cxsecurity.com/tricks/">Only Tricks</a>
+                                </li>
+                                <li>
+                                    <a href="https://cxsecurity.com/exploit/">Only Exploits</a>
+                                </li>
+                                <li>
+                                    <a href="https://cxsecurity.com/dorks/">Only Dorks</a>
+                                </li>
+                                <li>
+                                    <a href="https://cxsecurity.com/cvelist/">Only CVE</a>
+                                </li>
+                                <li>
+                                    <a href="https://cxsecurity.com/cwelist/">Only CWE</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="https://cxsecurity.com/bogus/">Fake Notes</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="https://cxsecurity.com/best/1/">Ranking</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                CVEMAP<span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li>
+                                    <a href="https://cxsecurity.com/cvemap/">Full List</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="https://cxsecurity.com/cvevendors/">Show Vendors</a>
+                                </li>
+                                <li>
+                                    <a href="https://cxsecurity.com/cveproducts/">Show Products</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="https://cxsecurity.com/allcwe/">CWE Dictionary</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="https://cxsecurity.com/cve/">Check CVE Id </a>
+                                </li>
+                                <li>
+                                    <a href="https://cxsecurity.com/cwe/">Check CWE Id</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="active">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                Search<span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li>
+                                    <a href="https://cxsecurity.com/search/">Bugtraq</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="https://cxsecurity.com/search/cve/">CVEMAP</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="https://cxsecurity.com/search/author/">By author</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="https://cxsecurity.com/cve/">CVE Id</a>
+                                </li>
+                                <li>
+                                    <a href="https://cxsecurity.com/cwe/">CWE Id</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="https://cxsecurity.com/cvevendors/">By vendors</a>
+                                </li>
+                                <li>
+                                    <a href="https://cxsecurity.com/cveproducts/">By products</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                RSS<span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li>
+                                    <a href="https://cxsecurity.com/wlb/rss/all/">Bugtraq</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="https://cxsecurity.com/cverss/fullmap/">CVEMAP</a>
+                                </li>
+                                <li>
+                                    <a href="https://cxsecurity.com/cveproducts/">CVE Products</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="https://cxsecurity.com/wlb/rss/vulnerabilities/">Bugs</a>
+                                </li>
+                                <li>
+                                    <a href="https://cxsecurity.com/wlb/rss/exploit/">Exploits</a>
+                                </li>
+                                <li>
+                                    <a href="https://cxsecurity.com/wlb/rss/dorks/">Dorks</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                More<span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li>
+                                    <a href="http://cifrex.org/">cIFrex</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="https://www.facebook.com/cxsec">Facebook</a>
+                                </li>
+                                <li>
+                                    <a href="https://twitter.com/cxsecurity">Twitter</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="https://cxsecurity.com/donate/">Donate</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="https://cxsecurity.com/wlb/about/">About</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="https://cxsecurity.com/wlb/add/">Submit</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="general">
+            <TABLE width="100%">
+                <TR>
+                    <TD width="6%"></TD>
+                    <TD id="boki"></TD>
+                    <TD id='glowna'>
+                        <CENTER>
+                            <script>
+                                angular.module('ui.bootstrap.demo').controller('SearchCtrl', function($scope) {
+                                    $scope.oneAtATime = true;
+                                    $scope.radioModel = 'wlb';
+
+                                    $scope.runIt = function() {
+
+                                        var what = $('#what').val();
+                                        var sort = $('#sort').val();
+                                        var logic = 'AND';
+                                        var limit = $('#limit').val();
+                                        var query = $('#inQuery').val();
+                                        if (query == '') {
+                                            alert("Empty input!");
+                                            return false;
+                                        }
+                                        ;query = query.replace("/", " ").replace("&", " ").replace("#", " ");
+                                        var toy = $('#TOy').val();
+                                        var tom = $('#TOm').val();
+                                        var tod = $('#TOd').val();
+                                        var fory = $('#FROMy').val();
+                                        var form = $('#FROMm').val();
+                                        var ford = $('#FROMd').val();
+
+                                        window.location = "https://cxsecurity.com/search/" + encodeURIComponent($scope.radioModel) + "/" + encodeURIComponent(sort) + "/" + encodeURIComponent(logic) + "/" + encodeURIComponent(toy + "." + tom + "." + tod + "." + fory + "." + form + "." + ford) + "/0/" + encodeURIComponent(limit) + "/" + encodeURIComponent(query) + "/";
+                                    }
+                                    ;
+                                });
+                            </script>
+                            <BR>
+                            <TABLE width="100%">
+                                <TR>
+                                    <TD bgcolor="#202020" width="100%" height="50%">
+                                        <DIV ng-controller="SearchCtrl">
+                                            <FORM name="searchwlb" placeholder="Search" ng-submit="runIt()">
+                                                <fieldset>
+                                                    <legend>&nbsp;Search</legend>
+                                                    <div class="form-group">
+                                                        <label for="inputQ" class="col-lg-2 control-label">Words</label>
+                                                        <div class="col-lg-12" ng-non-bindable>
+                                                            <input type="text" class="form-control" id="inQuery" style="background-color: black; margin-left: 0px; margin-right: 0px;" placeholder="" value="CVE">
+                                                        </div>
+                                                    </div>
+                                                    <CENTER>
+                                                        <div class="btn-group" id='what'>
+                                                            <label class="btn btn-default" ng-model="radioModel" btn-radio="'wlb'">Search in Bugtraq</label>
+                                                            <label class="btn btn-default" ng-model="radioModel" btn-radio="'cve'">Search in CVE Content</label>
+                                                            <label class="btn btn-default" ng-model="radioModel" btn-radio="'author'">Search by author</label>
+                                                        </div>
+                                                        <p>
+                                                        <TABLE>
+                                                            <TR>
+                                                                <TD></TD>
+                                                                <TD>
+                                                                    Order by: 
+                                                                    <SELECT NAME="sort" id="sort" class="dates">
+                                                                        <OPTION value="DESC" selected>DESC</OPTION>
+                                                                        <OPTION value="ASC">ASC</OPTION>
+                                                                    </SELECT>
+                                                                </TD>
+                                                                <TD>
+                                                                    Limit: 
+                                                                    <SELECT NAME="limit" id="limit" class="dates">
+                                                                        <OPTION value="10" selected>10</OPTION>
+                                                                        <OPTION value="30">30</OPTION>
+                                                                    </SELECT>
+                                                                </TD>
+                                                            </TR>
+                                                        </TABLE>
+                                                        <BR>
+                                                        <TABLE width="80%">
+                                                            <TR>
+                                                                <TD>
+                                                                    <div>
+                                                                        <accordion close-others="oneAtATime">
+                                                                            <accordion-group heading="Filtr by date range">
+                                                                                <TABLE width="80%">
+                                                                                    <TR>
+                                                                                        <TD>
+                                                                                            <B>
+                                                                                                <h4>For:</h4>
+                                                                                            </B>
+                                                                                        </TD>
+                                                                                        <TD>
+                                                                                            <SELECT NAME="FROMYEA" id="FROMy" class="dates">
+                                                                                                <OPTION value="2025">2025</OPTION>
+                                                                                                <OPTION value="2024">2024</OPTION>
+                                                                                                <OPTION value="2023">2023</OPTION>
+                                                                                                <OPTION value="2022">2022</OPTION>
+                                                                                                <OPTION value="2021">2021</OPTION>
+                                                                                                <OPTION value="2020">2020</OPTION>
+                                                                                                <OPTION value="2019">2019</OPTION>
+                                                                                                <OPTION value="2018">2018</OPTION>
+                                                                                                <OPTION value="2017">2017</OPTION>
+                                                                                                <OPTION value="2016">2016</OPTION>
+                                                                                                <OPTION value="2015">2015</OPTION>
+                                                                                                <OPTION value="2014">2014</OPTION>
+                                                                                                <OPTION value="2013">2013</OPTION>
+                                                                                                <OPTION value="2012">2012</OPTION>
+                                                                                                <OPTION value="2011">2011</OPTION>
+                                                                                                <OPTION value="2010">2010</OPTION>
+                                                                                                <OPTION value="2009">2009</OPTION>
+                                                                                                <OPTION value="2008">2008</OPTION>
+                                                                                                <OPTION value="2007">2007</OPTION>
+                                                                                                <OPTION value="2006">2006</OPTION>
+                                                                                                <OPTION value="2005">2005</OPTION>
+                                                                                                <OPTION value="2004">2004</OPTION>
+                                                                                                <OPTION value="2003">2003</OPTION>
+                                                                                                <OPTION value="2002">2002</OPTION>
+                                                                                                <OPTION value="2001">2001</OPTION>
+                                                                                                <OPTION value="2000">2000</OPTION>
+                                                                                                <OPTION value="1999" selected>1999</OPTION>
+                                                                                            </SELECT>
+                                                                                            <SELECT NAME="FROMMON" id="FROMm" class="dates">
+                                                                                                <OPTION value="1" selected>1</OPTION>
+                                                                                                <OPTION value="2" data-icon="glyphicon-heart">2</OPTION>
+                                                                                                <OPTION value="3" data-icon="glyphicon-heart">3</OPTION>
+                                                                                                <OPTION value="4" data-icon="glyphicon-heart">4</OPTION>
+                                                                                                <OPTION value="5" data-icon="glyphicon-heart">5</OPTION>
+                                                                                                <OPTION value="6" data-icon="glyphicon-heart">6</OPTION>
+                                                                                                <OPTION value="7" data-icon="glyphicon-heart">7</OPTION>
+                                                                                                <OPTION value="8" data-icon="glyphicon-heart">8</OPTION>
+                                                                                                <OPTION value="9" data-icon="glyphicon-heart">9</OPTION>
+                                                                                                <OPTION value="10" data-icon="glyphicon-heart">10</OPTION>
+                                                                                                <OPTION value="11" data-icon="glyphicon-heart">11</OPTION>
+                                                                                                <OPTION value="12" data-icon="glyphicon-heart">12</OPTION>
+                                                                                            </SELECT>
+                                                                                            <SELECT NAME="FROMDAY" id="FROMd" class="dates">
+                                                                                                <OPTION value="1" selected>1</OPTION>
+                                                                                                <OPTION value="2">2</OPTION>
+                                                                                                <OPTION value="3">3</OPTION>
+                                                                                                <OPTION value="4">4</OPTION>
+                                                                                                <OPTION value="5">5</OPTION>
+                                                                                                <OPTION value="6">6</OPTION>
+                                                                                                <OPTION value="7">7</OPTION>
+                                                                                                <OPTION value="8">8</OPTION>
+                                                                                                <OPTION value="9">9</OPTION>
+                                                                                                <OPTION value="10">10</OPTION>
+                                                                                                <OPTION value="11">11</OPTION>
+                                                                                                <OPTION value="12">12</OPTION>
+                                                                                                <OPTION value="13">13</OPTION>
+                                                                                                <OPTION value="14">14</OPTION>
+                                                                                                <OPTION value="15">15</OPTION>
+                                                                                                <OPTION value="16">16</OPTION>
+                                                                                                <OPTION value="17">17</OPTION>
+                                                                                                <OPTION value="18">18</OPTION>
+                                                                                                <OPTION value="19">19</OPTION>
+                                                                                                <OPTION value="20">20</OPTION>
+                                                                                                <OPTION value="21">21</OPTION>
+                                                                                                <OPTION value="22">22</OPTION>
+                                                                                                <OPTION value="23">23</OPTION>
+                                                                                                <OPTION value="24">24</OPTION>
+                                                                                                <OPTION value="25">25</OPTION>
+                                                                                                <OPTION value="26">26</OPTION>
+                                                                                                <OPTION value="27">27</OPTION>
+                                                                                                <OPTION value="28">28</OPTION>
+                                                                                                <OPTION value="29">29</OPTION>
+                                                                                                <OPTION value="30">30</OPTION>
+                                                                                                <OPTION value="31">31</OPTION>
+                                                                                            </SELECT>
+                                                                                        </TD>
+                                                                                        <TD>
+                                                                                            <B>
+                                                                                                <h4>&nbsp;To:</h4>
+                                                                                            </B>
+                                                                                        </TD>
+                                                                                        <TD>
+                                                                                            <SELECT NAME="TOYEA" id="TOy" class="dates">
+                                                                                                <OPTION value="2025" selected>2025</OPTION>
+                                                                                                <OPTION value="2024">2024</OPTION>
+                                                                                                <OPTION value="2023">2023</OPTION>
+                                                                                                <OPTION value="2022">2022</OPTION>
+                                                                                                <OPTION value="2021">2021</OPTION>
+                                                                                                <OPTION value="2020">2020</OPTION>
+                                                                                                <OPTION value="2019">2019</OPTION>
+                                                                                                <OPTION value="2018">2018</OPTION>
+                                                                                                <OPTION value="2017">2017</OPTION>
+                                                                                                <OPTION value="2016">2016</OPTION>
+                                                                                                <OPTION value="2015">2015</OPTION>
+                                                                                                <OPTION value="2014">2014</OPTION>
+                                                                                                <OPTION value="2013">2013</OPTION>
+                                                                                                <OPTION value="2012">2012</OPTION>
+                                                                                                <OPTION value="2011">2011</OPTION>
+                                                                                                <OPTION value="2010">2010</OPTION>
+                                                                                                <OPTION value="2009">2009</OPTION>
+                                                                                                <OPTION value="2008">2008</OPTION>
+                                                                                                <OPTION value="2007">2007</OPTION>
+                                                                                                <OPTION value="2006">2006</OPTION>
+                                                                                                <OPTION value="2005">2005</OPTION>
+                                                                                                <OPTION value="2004">2004</OPTION>
+                                                                                                <OPTION value="2003">2003</OPTION>
+                                                                                                <OPTION value="2002">2002</OPTION>
+                                                                                                <OPTION value="2001">2001</OPTION>
+                                                                                                <OPTION value="2000">2000</OPTION>
+                                                                                                <OPTION value="1999">1999</OPTION>
+                                                                                            </SELECT>
+                                                                                            <SELECT NAME="TOMON" id="TOm" class="dates">
+                                                                                                <OPTION value="1" data-icon="glyphicon-heart">1</OPTION>
+                                                                                                <OPTION value="2" data-icon="glyphicon-heart">2</OPTION>
+                                                                                                <OPTION value="3" data-icon="glyphicon-heart">3</OPTION>
+                                                                                                <OPTION value="4" selected>4</OPTION>
+                                                                                                <OPTION value="5" data-icon="glyphicon-heart">5</OPTION>
+                                                                                                <OPTION value="6" data-icon="glyphicon-heart">6</OPTION>
+                                                                                                <OPTION value="7" data-icon="glyphicon-heart">7</OPTION>
+                                                                                                <OPTION value="8" data-icon="glyphicon-heart">8</OPTION>
+                                                                                                <OPTION value="9" data-icon="glyphicon-heart">9</OPTION>
+                                                                                                <OPTION value="10" data-icon="glyphicon-heart">10</OPTION>
+                                                                                                <OPTION value="11" data-icon="glyphicon-heart">11</OPTION>
+                                                                                                <OPTION value="12" data-icon="glyphicon-heart">12</OPTION>
+                                                                                            </SELECT>
+                                                                                            <SELECT NAME="TODAY" id="TOd" class="dates">
+                                                                                                <OPTION value="1">1</OPTION>
+                                                                                                <OPTION value="2">2</OPTION>
+                                                                                                <OPTION value="3">3</OPTION>
+                                                                                                <OPTION value="4">4</OPTION>
+                                                                                                <OPTION value="5">5</OPTION>
+                                                                                                <OPTION value="6">6</OPTION>
+                                                                                                <OPTION value="7">7</OPTION>
+                                                                                                <OPTION value="8">8</OPTION>
+                                                                                                <OPTION value="9">9</OPTION>
+                                                                                                <OPTION value="10">10</OPTION>
+                                                                                                <OPTION value="11">11</OPTION>
+                                                                                                <OPTION value="12">12</OPTION>
+                                                                                                <OPTION value="13">13</OPTION>
+                                                                                                <OPTION value="14">14</OPTION>
+                                                                                                <OPTION value="15">15</OPTION>
+                                                                                                <OPTION value="16">16</OPTION>
+                                                                                                <OPTION value="17" selected>17</OPTION>
+                                                                                                <OPTION value="18">18</OPTION>
+                                                                                                <OPTION value="19">19</OPTION>
+                                                                                                <OPTION value="20">20</OPTION>
+                                                                                                <OPTION value="21">21</OPTION>
+                                                                                                <OPTION value="22">22</OPTION>
+                                                                                                <OPTION value="23">23</OPTION>
+                                                                                                <OPTION value="24">24</OPTION>
+                                                                                                <OPTION value="25">25</OPTION>
+                                                                                                <OPTION value="26">26</OPTION>
+                                                                                                <OPTION value="27">27</OPTION>
+                                                                                                <OPTION value="28">28</OPTION>
+                                                                                                <OPTION value="29">29</OPTION>
+                                                                                                <OPTION value="30">30</OPTION>
+                                                                                                <OPTION value="31">31</OPTION>
+                                                                                            </SELECT>
+                                                                                        </TD>
+                                                                                    </TR>
+                                                                                </TABLE>
+                                                                            </accordion-group>
+                                                                        </accordion>
+                                                                </TD>
+                                                            </TR>
+                                                            <TR>
+                                                                <TD>
+                                                                    <a href="" class="btn btn-default btn-lg btn-block" ng-click="runIt()" class="submitsearch" tabindex="1" type="submit">Run search</a>
+                                                                </TD>
+                                                            </TR>
+                                                        </TABLE>
+                                                        <BR>&nbsp;
+                                        </div>
+</FORM></TD></TR></TABLE><BR>
+<TABLE width='70%'>
+    <TR>
+        <TD>
+            <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5074670963595353" data-ad-slot="9413498831" data-ad-format="auto"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </TD>
+    </TR>
+</TABLE>
+<!-- krec -->
+<script type="text/javascript">
+    !function(t, e) {
+        "object" == typeof exports ? module.exports = e() : "function" == typeof define && define.amd ? define(e) : t.Spinner = e()
+    }(this, function() {
+        "use strict";
+        function t(t, e) {
+            var i, o = document.createElement(t || "div");
+            for (i in e)
+                o[i] = e[i];
+            return o
+        }
+        function e(t) {
+            for (var e = 1, i = arguments.length; i > e; e++)
+                t.appendChild(arguments[e]);
+            return t
+        }
+        function i(t, e, i, o) {
+            var n = ["opacity", e, ~~(100 * t), i, o].join("-")
+              , r = .01 + i / o * 100
+              , s = Math.max(1 - (1 - t) / e * (100 - r), t)
+              , a = c.substring(0, c.indexOf("Animation")).toLowerCase()
+              , l = a && "-" + a + "-" || "";
+            return p[n] || (u.insertRule("@" + l + "keyframes " + n + "{0%{opacity:" + s + "}" + r + "%{opacity:" + t + "}" + (r + .01) + "%{opacity:1}" + (r + e) % 100 + "%{opacity:" + t + "}100%{opacity:" + s + "}}", u.cssRules.length),
+            p[n] = 1),
+            n
+        }
+        function o(t, e) {
+            var i, o, n = t.style;
+            for (e = e.charAt(0).toUpperCase() + e.slice(1),
+            o = 0; o < d.length; o++)
+                if (i = d[o] + e,
+                void 0 !== n[i])
+                    return i;
+            return void 0 !== n[e] ? e : void 0
+        }
+        function n(t, e) {
+            for (var i in e)
+                t.style[o(t, i) || i] = e[i];
+            return t
+        }
+        function r(t) {
+            for (var e = 1; e < arguments.length; e++) {
+                var i = arguments[e];
+                for (var o in i)
+                    void 0 === t[o] && (t[o] = i[o])
+            }
+            return t
+        }
+        function s(t, e) {
+            return "string" == typeof t ? t : t[e % t.length]
+        }
+        function a(t) {
+            this.opts = r(t || {}, a.defaults, f)
+        }
+        function l() {
+            function i(e, i) {
+                return t("<" + e + ' xmlns="urn:schemas-microsoft.com:vml" class="spin-vml">', i)
+            }
+            u.addRule(".spin-vml", "behavior:url(#default#VML)"),
+            a.prototype.lines = function(t, o) {
+                function r() {
+                    return n(i("group", {
+                        coordsize: d + " " + d,
+                        coordorigin: -c + " " + -c
+                    }), {
+                        width: d,
+                        height: d
+                    })
+                }
+                function a(t, a, l) {
+                    e(u, e(n(r(), {
+                        rotation: 360 / o.lines * t + "deg",
+                        left: ~~a
+                    }), e(n(i("roundrect", {
+                        arcsize: o.corners
+                    }), {
+                        width: c,
+                        height: o.width,
+                        left: o.radius,
+                        top: -o.width >> 1,
+                        filter: l
+                    }), i("fill", {
+                        color: s(o.color, t),
+                        opacity: o.opacity
+                    }), i("stroke", {
+                        opacity: 0
+                    }))))
+                }
+                var l, c = o.length + o.width, d = 2 * c, p = 2 * -(o.width + o.length) + "px", u = n(r(), {
+                    position: "absolute",
+                    top: p,
+                    left: p
+                });
+                if (o.shadow)
+                    for (l = 1; l <= o.lines; l++)
+                        a(l, -2, "progid:DXImageTransform.Microsoft.Blur(pixelradius=2,makeshadow=1,shadowopacity=.3)");
+                for (l = 1; l <= o.lines; l++)
+                    a(l);
+                return e(t, u)
+            }
+            ,
+            a.prototype.opacity = function(t, e, i, o) {
+                var n = t.firstChild;
+                o = o.shadow && o.lines || 0,
+                n && e + o < n.childNodes.length && (n = n.childNodes[e + o],
+                n = n && n.firstChild,
+                n = n && n.firstChild,
+                n && (n.opacity = i))
+            }
+        }
+        var c, d = ["webkit", "Moz", "ms", "O"], p = {}, u = function() {
+            var i = t("style", {
+                type: "text/css"
+            });
+            return e(document.getElementsByTagName("head")[0], i),
+            i.sheet || i.styleSheet
+        }(), f = {
+            lines: 12,
+            length: 7,
+            width: 5,
+            radius: 10,
+            rotate: 0,
+            corners: 1,
+            color: "#000",
+            direction: 1,
+            speed: 1,
+            trail: 100,
+            opacity: .25,
+            fps: 20,
+            zIndex: 2e9,
+            className: "spinner",
+            top: "50%",
+            left: "50%",
+            position: "absolute"
+        };
+        a.defaults = {},
+        r(a.prototype, {
+            spin: function(e) {
+                this.stop();
+                {
+                    var i = this
+                      , o = i.opts
+                      , r = i.el = n(t(0, {
+                        className: o.className
+                    }), {
+                        position: o.position,
+                        width: 0,
+                        zIndex: o.zIndex
+                    });
+                    o.radius + o.length + o.width
+                }
+                if (n(r, {
+                    left: o.left,
+                    top: o.top
+                }),
+                e && e.insertBefore(r, e.firstChild || null),
+                r.setAttribute("role", "progressbar"),
+                i.lines(r, i.opts),
+                !c) {
+                    var s, a = 0, l = (o.lines - 1) * (1 - o.direction) / 2, d = o.fps, p = d / o.speed, u = (1 - o.opacity) / (p * o.trail / 100), f = p / o.lines;
+                    !function h() {
+                        a++;
+                        for (var t = 0; t < o.lines; t++)
+                            s = Math.max(1 - (a + (o.lines - t) * f) % p * u, o.opacity),
+                            i.opacity(r, t * o.direction + l, s, o);
+                        i.timeout = i.el && setTimeout(h, ~~(1e3 / d))
+                    }()
+                }
+                return i
+            },
+            stop: function() {
+                var t = this.el;
+                return t && (clearTimeout(this.timeout),
+                t.parentNode && t.parentNode.removeChild(t),
+                this.el = void 0),
+                this
+            },
+            lines: function(o, r) {
+                function a(e, i) {
+                    return n(t(), {
+                        position: "absolute",
+                        width: r.length + r.width + "px",
+                        height: r.width + "px",
+                        background: e,
+                        boxShadow: i,
+                        transformOrigin: "left",
+                        transform: "rotate(" + ~~(360 / r.lines * d + r.rotate) + "deg) translate(" + r.radius + "px,0)",
+                        borderRadius: (r.corners * r.width >> 1) + "px"
+                    })
+                }
+                for (var l, d = 0, p = (r.lines - 1) * (1 - r.direction) / 2; d < r.lines; d++)
+                    l = n(t(), {
+                        position: "absolute",
+                        top: 1 + ~(r.width / 2) + "px",
+                        transform: r.hwaccel ? "translate3d(0,0,0)" : "",
+                        opacity: r.opacity,
+                        animation: c && i(r.opacity, r.trail, p + d * r.direction, r.lines) + " " + 1 / r.speed + "s linear infinite"
+                    }),
+                    r.shadow && e(l, n(a("#000", "0 0 4px #000"), {
+                        top: "2px"
+                    })),
+                    e(o, e(l, a(s(r.color, d), "0 0 1px rgba(0,0,0,.1)")));
+                return o
+            },
+            opacity: function(t, e, i) {
+                e < t.childNodes.length && (t.childNodes[e].style.opacity = i)
+            }
+        });
+        var h = n(t("group"), {
+            behavior: "url(#default#VML)"
+        });
+        return !o(h, "transform") && h.adj ? l() : c = o(h, "animation"),
+        a
+    });
+</script>
+<script type="text/javascript">
+    angular.module('ui.bootstrap.demo').controller('PagIt', function($scope, $log) {
+        $scope.totalItems = 1000;
+        $scope.currentPage = 0;
+        $scope.maxSize = 5;
+        $scope.perPage = 10;
+
+        $scope.pageChanged = function() {
+
+            var opts = {
+                lines: 16,
+                length: 50,
+                width: 10,
+                radius: 60,
+                corners: 1,
+                rotate: 0,
+                direction: 1,
+                color: '#FFFFFF',
+                speed: 2.2,
+                trail: 60,
+                shadow: true,
+                hwaccel: false,
+                className: 'spinner',
+                zIndex: 2e9,
+                top: '500%',
+                left: '50%'
+            };
+
+            $("#general").hide();
+            var target = document.getElementById('frezz');
+            var spinner = new Spinner(opts).spin(target);
+            window.location.href = "https://cxsecurity.com/search/wlb/DESC/AND/2025.4.17.1999.1.1/" + $scope.currentPage + "/10/CVE/";
+        }
+        ;
+    });
+</script>
+<div ng-controller="PagIt">
+    <pagination total-items="totalItems" items-per-page="perPage" ng-model="currentPage" ng-change="pageChanged()" class="pagination" boundary-links="false" direction-links="true" max-size="maxSize"></pagination>
+</div>
+<DIV ng-non-bindable>
+    <TABLE WIDTH="100%" BORDER="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+        <TR>
+            <TD width="17" bgcolor="#505150"></TD>
+            <TD width="500" bgcolor="#505150">
+                <b>
+                    <center>Topic</center>
+                </b>
+            </TD>
+            <TD width="80" bgcolor="#505150">
+                <b>
+                    <center>Date</center>
+                </b>
+            </TD>
+            <TD width="128" bgcolor="#505150">
+                <b>
+                    <center>Author</center>
+                </b>
+            </TD>
+        </TR>
+        <TR>
+            <TD width="17" bgcolor="#202020">
+                <center>
+                    <span class="label label-warning">Med.</span>
+                </center>
+            </TD>
+            <TD width="550" bgcolor="#202020">
+                <h6>
+                    <A href="https://cxsecurity.com/issue/WLB-2024030055" title=" Microsoft Outlook Remote Code Execution Vulnerability - CVE-2024-21413" style="text-decoration: none;">Microsoft Outlook Remote Code Execution Vulnerability - CVE-2024-21413</A>
+                </h6>
+            </TD>
+            <TD width="80" bgcolor="#202020">
+                <center>
+                    <h6>
+                        <span class="label label-default">24.03.2024</span>
+                </center>
+                <h/6>
+            </TD>
+            <TD width="128" bgcolor="#202020">
+                <center>
+                    <span class="label label-default">
+                        <A HREF="https://cxsecurity.com/author/nu11secur1ty/1/">nu11secur1ty</a>
+                    </span>
+                </center>
+            </TD>
+        </TR>
+        <TR>
+            <TD width="17" bgcolor="#1B1B1B">
+                <center>
+                    <span class="label label-success">Low</span>
+                </center>
+            </TD>
+            <TD width="550" bgcolor="#1B1B1B">
+                <h6>
+                    <A href="https://cxsecurity.com/issue/WLB-2024030005" title="GL.iNet AR300M v3.216 Remote Code Execution CVE-2023-46456 Exploit" style="text-decoration: none;">GL.iNet AR300M v3.216 Remote Code Execution CVE-2023-46456 Exploit</A>
+                </h6>
+            </TD>
+            <TD width="80" bgcolor="#1B1B1B">
+                <center>
+                    <h6>
+                        <span class="label label-default">03.03.2024</span>
+                </center>
+                <h/6>
+            </TD>
+            <TD width="128" bgcolor="#1B1B1B">
+                <center>
+                    <span class="label label-default">
+                        <A HREF="https://cxsecurity.com/author/Michele+%26%23039%3Bcyberaz0r%26%23039%3B+Di+Bonaventura/1/">Michele &#039;cyberaz0r &#039;Di...</a>
+                    </span>
+                </center>
+            </TD>
+        </TR>
+        <TR>
+            <TD width="17" bgcolor="#202020">
+                <center>
+                    <span class="label label-warning">Med.</span>
+                </center>
+            </TD>
+            <TD width="550" bgcolor="#202020">
+                <h6>
+                    <A href="https://cxsecurity.com/issue/WLB-2024020060" title="Wyrestorm Apollo VX20 / Incorrect Access Control - DoS  / CVE-2024-25736" style="text-decoration: none;">Wyrestorm Apollo VX20 / Incorrect Access Control - DoS  / CVE-2024-25736</A>
+                </h6>
+            </TD>
+            <TD width="80" bgcolor="#202020">
+                <center>
+                    <h6>
+                        <span class="label label-default">18.02.2024</span>
+                </center>
+                <h/6>
+            </TD>
+            <TD width="128" bgcolor="#202020">
+                <center>
+                    <span class="label label-default">
+                        <A HREF="https://cxsecurity.com/author/hyp3rlinx/1/">hyp3rlinx</a>
+                    </span>
+                </center>
+            </TD>
+        </TR>
+        <TR>
+            <TD width="17" bgcolor="#1B1B1B">
+                <center>
+                    <span class="label label-warning">Med.</span>
+                </center>
+            </TD>
+            <TD width="550" bgcolor="#1B1B1B">
+                <h6>
+                    <A href="https://cxsecurity.com/issue/WLB-2024020059" title="Wyrestorm Apollo VX20 Incorrect Access Control /  Credentials Disclosure / CVE-2024-25735" style="text-decoration: none;">Wyrestorm Apollo VX20 Incorrect Access Control /  Credentials Disclosure / CVE-2024-25735</A>
+                </h6>
+            </TD>
+            <TD width="80" bgcolor="#1B1B1B">
+                <center>
+                    <h6>
+                        <span class="label label-default">18.02.2024</span>
+                </center>
+                <h/6>
+            </TD>
+            <TD width="128" bgcolor="#1B1B1B">
+                <center>
+                    <span class="label label-default">
+                        <A HREF="https://cxsecurity.com/author/hyp3rlinx/1/">hyp3rlinx</a>
+                    </span>
+                </center>
+            </TD>
+        </TR>
+        <TR>
+            <TD width="17" bgcolor="#202020">
+                <center>
+                    <span class="label label-warning">Med.</span>
+                </center>
+            </TD>
+            <TD width="550" bgcolor="#202020">
+                <h6>
+                    <A href="https://cxsecurity.com/issue/WLB-2023070054" title="CVE-2023-36339 WebBoss.io CMS IDOR" style="text-decoration: none;">CVE-2023-36339 WebBoss.io CMS IDOR</A>
+                </h6>
+            </TD>
+            <TD width="80" bgcolor="#202020">
+                <center>
+                    <h6>
+                        <span class="label label-default">23.07.2023</span>
+                </center>
+                <h/6>
+            </TD>
+            <TD width="128" bgcolor="#202020">
+                <center>
+                    <span class="label label-default">
+                        <A HREF="https://cxsecurity.com/author/Steven+n0tst3+Black/1/">Steven n0tst3 Black</a>
+                    </span>
+                </center>
+            </TD>
+        </TR>
+        <TR>
+            <TD width="17" bgcolor="#1B1B1B">
+                <center>
+                    <span class="label label-warning">Med.</span>
+                </center>
+            </TD>
+            <TD width="550" bgcolor="#1B1B1B">
+                <h6>
+                    <A href="https://cxsecurity.com/issue/WLB-2023030062" title="RSA NetWitness Platform EDR Agent / Incorrect Access Control - Code Execution / CVE-2022-47529" style="text-decoration: none;">RSA NetWitness Platform EDR Agent / Incorrect Access Control - Code Execution / CVE-2022-47529</A>
+                </h6>
+            </TD>
+            <TD width="80" bgcolor="#1B1B1B">
+                <center>
+                    <h6>
+                        <span class="label label-default">30.03.2023</span>
+                </center>
+                <h/6>
+            </TD>
+            <TD width="128" bgcolor="#1B1B1B">
+                <center>
+                    <span class="label label-default">
+                        <A HREF="https://cxsecurity.com/author/hyp3rlinx/1/">hyp3rlinx</a>
+                    </span>
+                </center>
+            </TD>
+        </TR>
+        <TR>
+            <TD width="17" bgcolor="#202020">
+                <center>
+                    <span class="label label-danger">High</span>
+                </center>
+            </TD>
+            <TD width="550" bgcolor="#202020">
+                <h6>
+                    <A href="https://cxsecurity.com/issue/WLB-2023020049" title="Microsoft Windows Contact File / Remote Code Execution (Resurrected) CVE-2022-44666" style="text-decoration: none;">Microsoft Windows Contact File / Remote Code Execution (Resurrected) CVE-2022-44666</A>
+                </h6>
+            </TD>
+            <TD width="80" bgcolor="#202020">
+                <center>
+                    <h6>
+                        <span class="label label-default">27.02.2023</span>
+                </center>
+                <h/6>
+            </TD>
+            <TD width="128" bgcolor="#202020">
+                <center>
+                    <span class="label label-default">
+                        <A HREF="https://cxsecurity.com/author/hyp3rlinx/1/">hyp3rlinx</a>
+                    </span>
+                </center>
+            </TD>
+        </TR>
+        <TR>
+            <TD width="17" bgcolor="#1B1B1B">
+                <center>
+                    <span class="label label-danger">High</span>
+                </center>
+            </TD>
+            <TD width="550" bgcolor="#1B1B1B">
+                <h6>
+                    <A href="https://cxsecurity.com/issue/WLB-2022060052" title="Chrome CVE-2022-1096 Incomplete Fix" style="text-decoration: none;">Chrome CVE-2022-1096 Incomplete Fix</A>
+                </h6>
+            </TD>
+            <TD width="80" bgcolor="#1B1B1B">
+                <center>
+                    <h6>
+                        <span class="label label-default">20.06.2022</span>
+                </center>
+                <h/6>
+            </TD>
+            <TD width="128" bgcolor="#1B1B1B">
+                <center>
+                    <span class="label label-default">
+                        <A HREF="https://cxsecurity.com/author/Google+Security+Research/1/">Google Security Resear...</a>
+                    </span>
+                </center>
+            </TD>
+        </TR>
+        <TR>
+            <TD width="17" bgcolor="#202020">
+                <center>
+                    <span class="label label-success">Low</span>
+                </center>
+            </TD>
+            <TD width="550" bgcolor="#202020">
+                <h6>
+                    <A href="https://cxsecurity.com/issue/WLB-2020090040" title="Push Diary Crash on Specifically Crafted HTTP/2 Header (CVE-2020-11993)" style="text-decoration: none;">Push Diary Crash on Specifically Crafted HTTP/2 Header (CVE-2020-11993)</A>
+                </h6>
+            </TD>
+            <TD width="80" bgcolor="#202020">
+                <center>
+                    <h6>
+                        <span class="label label-default">08.09.2020</span>
+                </center>
+                <h/6>
+            </TD>
+            <TD width="128" bgcolor="#202020">
+                <center>
+                    <span class="label label-default">
+                        <A HREF="https://cxsecurity.com/author/Obaida+Ismail/1/">Obaida Ismail</a>
+                    </span>
+                </center>
+            </TD>
+        </TR>
+        <TR>
+            <TD width="17" bgcolor="#1B1B1B">
+                <center>
+                    <span class="label label-warning">Med.</span>
+                </center>
+            </TD>
+            <TD width="550" bgcolor="#1B1B1B">
+                <h6>
+                    <A href="https://cxsecurity.com/issue/WLB-2020080009" title="ABUS Secvest Hybrid Module FUMO50110 Authentication Bypass" style="text-decoration: none;">ABUS Secvest Hybrid Module FUMO50110 Authentication Bypass</A>
+                </h6>
+            </TD>
+            <TD width="80" bgcolor="#1B1B1B">
+                <center>
+                    <h6>
+                        <span class="label label-default">01.08.2020</span>
+                </center>
+                <h/6>
+            </TD>
+            <TD width="128" bgcolor="#1B1B1B">
+                <center>
+                    <span class="label label-default">
+                        <A HREF="https://cxsecurity.com/author/Matthias+Deeg/1/">Matthias Deeg</a>
+                    </span>
+                </center>
+            </TD>
+        </TR>
+    </TABLE>
+</div>
+<div ng-controller="PagIt">
+    <pagination total-items="totalItems" items-per-page="perPage" ng-model="currentPage" ng-change="pageChanged()" class="pagination" boundary-links="false" direction-links="true" max-size="maxSize"></pagination>
+</div>
+<TABLE width="70%">
+    <TR>
+        <TD>
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5074670963595353" data-ad-slot="9413498831" data-ad-format="auto"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </TD>
+    </TR>
+</TABLE>
+<P>&nbsp;
+<HR>
+Copyright <b>2025</b>
+, cxsecurity.com<P>&nbsp;
+</TD><TD id='boki'></TD>
+<TD width="6%"></TD>
+</TR></TABLE><a href="#" class="back-to-top">Back to Top</a>
+</DIV></DIV></BODY></HTML>
